@@ -30,6 +30,7 @@ screen.clear()
 screen.hideCursor()
 
 render = ->
+  screen.clear()
   screen.setForegroundColor cycle.color
   for wall in cycle.walls
     do (wall) ->
@@ -40,6 +41,7 @@ render = ->
 
 gameLoop = ->
   cycle.move()
+  cycle.checkCollisions()
   render()
 
 render()
