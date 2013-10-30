@@ -1,5 +1,4 @@
 directions = require './directions'
-buffer = require './buffer'
 Cycle = require './cycle'
 screen = require './screen'
 
