@@ -2,7 +2,9 @@ directions = require './directions'
 Cycle = require './cycle'
 screen = require './screen'
 
-cycle = new Cycle(1, 1, 1, 4)
+cycles = []
+cycles.push new Cycle(1, 1, 1, 4)
+cycles.push new Cycle(process.stdout.columns, process.stdout.rows, directions.LEFT, 1)
 
 onSigInt = ->
   screen.clear()
@@ -18,30 +20,41 @@ process.stdin.on 'data', (chunk)->
     when 3
       process.kill process.pid, 'SIGINT'
     when 106
-      cycle.turnDown()
+      cycles[0].turnDown()
     when 107
-      cycle.turnUp()
+      cycles[0].turnUp()
     when 104
-      cycle.turnLeft()
+      cycles[0].turnLeft()
     when 108
-      cycle.turnRight()
+      cycles[0].turnRight()
+    when 115
+      cycles[1].turnDown()
+    when 100
+      cycles[1].turnUp()
+    when 97
+      cycles[1].turnLeft()
+    when 102
+      cycles[1].turnRight()
 
 screen.clear()
 screen.hideCursor()
 
 render = ->
   screen.clear()
-  screen.setForegroundColor cycle.color
-  for wall in cycle.walls
-    do (wall) ->
+  for cycle in cycles
+    screen.setForegroundColor cycle.color
+    for wall in cycle.walls
       screen.moveTo(wall.x, wall.y)
       process.stdout.write wall.character()
-  screen.moveTo(cycle.x, cycle.y)
-  process.stdout.write cycle.character()
+  for cycle in cycles
+    screen.setForegroundColor cycle.color
+    screen.moveTo(cycle.x, cycle.y)
+    process.stdout.write cycle.character()
 
 gameLoop = ->
-  cycle.move()
-  cycle.checkCollisions()
+  for cycle in cycles
+    cycle.move()
+    cycle.checkCollisions(cycles)
   render()
 
 render()

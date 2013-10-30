@@ -64,13 +64,21 @@ class Cycle
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y
 
-  checkCollisions: ->
-    for wall in @walls
-      if @checkCollisionWith(wall)
-        @state = CYCLE_STATES.EXPLODING
-        @walls.length = 0
-        @state_counter = 30
-        return
+  checkCollisions: (cycles)->
+    for cycle in cycles
+      unless cycle is @
+        if @checkCollisionWith(cycle)
+          @triggerCollision()
+          return
+      for wall in cycle.walls
+        if @checkCollisionWith(wall)
+          @triggerCollision()
+          return
+
+  triggerCollision: ->
+    @state = CYCLE_STATES.EXPLODING
+    @walls.length = 0
+    @state_counter = 30
 
   nextWallType: ->
     lastWallDirection = @walls[@walls.length - 1]?.direction ? @direction
