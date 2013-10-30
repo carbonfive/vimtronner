@@ -8,19 +8,37 @@ CYCLE_CHAR[directions.DOWN] = buffer(0xE2, 0x95, 0xBD)
 CYCLE_CHAR[directions.LEFT] = buffer(0xE2, 0x95, 0xBE)
 CYCLE_CHAR[directions.RIGHT] = buffer(0xE2, 0x95, 0xBC)
 
+DIRECTIONS_TO_WALL_TYPES = {}
+DIRECTIONS_TO_WALL_TYPES[directions.UP] = {}
+DIRECTIONS_TO_WALL_TYPES[directions.UP][directions.UP] = Wall.WALL_TYPES.NORTH_SOUTH
+DIRECTIONS_TO_WALL_TYPES[directions.UP][directions.DOWN] = Wall.WALL_TYPES.NORTH_SOUTH
+DIRECTIONS_TO_WALL_TYPES[directions.UP][directions.LEFT] = Wall.WALL_TYPES.NORTH_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.UP][directions.RIGHT] = Wall.WALL_TYPES.NORTH_EAST
+DIRECTIONS_TO_WALL_TYPES[directions.DOWN] = {}
+DIRECTIONS_TO_WALL_TYPES[directions.DOWN][directions.UP] = Wall.WALL_TYPES.NORTH_SOUTH
+DIRECTIONS_TO_WALL_TYPES[directions.DOWN][directions.DOWN] = Wall.WALL_TYPES.NORTH_SOUTH
+DIRECTIONS_TO_WALL_TYPES[directions.DOWN][directions.LEFT] = Wall.WALL_TYPES.SOUTH_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.DOWN][directions.RIGHT] = Wall.WALL_TYPES.SOUTH_EAST
+DIRECTIONS_TO_WALL_TYPES[directions.LEFT] = {}
+DIRECTIONS_TO_WALL_TYPES[directions.LEFT][directions.UP] = Wall.WALL_TYPES.SOUTH_EAST
+DIRECTIONS_TO_WALL_TYPES[directions.LEFT][directions.DOWN] = Wall.WALL_TYPES.NORTH_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.LEFT][directions.LEFT] = Wall.WALL_TYPES.EAST_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.LEFT][directions.RIGHT] = Wall.WALL_TYPES.EAST_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.RIGHT] = {}
+DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.UP] = Wall.WALL_TYPES.SOUTH_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.DOWN] = Wall.WALL_TYPES.NORTH_EAST
+DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.LEFT] = Wall.WALL_TYPES.EAST_WEST
+DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.RIGHT] = Wall.WALL_TYPES.EAST_WEST
+
 class Cycle
-  constructor: (x, y, direction, color)->
-    @x = x
-    @y = y
-    @direction = direction
-    @color = color
+  constructor: (@x, @y, @direction, @color)->
     @walls = []
 
   character: ->
     CYCLE_CHAR[@direction]
 
   move: ->
-    @walls.push new Wall(@x, @y, @nextWallType())
+    @walls.push new Wall(@x, @y, @nextWallType(), @direction)
     switch @direction
       when directions.UP
         @y -= 1 unless @y == 1
@@ -32,12 +50,8 @@ class Cycle
         @x += 1 unless @x == process.stdout.columns
 
   nextWallType: ->
-    lastWallType = @walls.last?.type
-    lastWallType ?= switch @direction
-      when directions.UP, directions.DOWN
-        Wall.WALL_TYPES.NORTH_SOUTH
-      when directions.LEFT, directions.RIGHT
-        Wall.WALL_TYPES.EAST_WEST
+    lastWallDirection = @walls.last?.direction ? @direction
+    DIRECTIONS_TO_WALL_TYPES[lastWallDirection][@direction]
 
   turnLeft: -> @direction = directions.LEFT unless @direction is directions.RIGHT
   turnRight: -> @direction = directions.RIGHT unless @direction is directions.LEFT

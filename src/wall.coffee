@@ -18,13 +18,9 @@ WALL_CHARACTERS[WALL_TYPES.NORTH_EAST] = buffer(0xE2, 0x94, 0x90)
 WALL_CHARACTERS[WALL_TYPES.SOUTH_EAST] = buffer(0xE2, 0x94, 0x98)
 
 class Wall
-  constructor: (x, y, type)->
-    @x = x
-    @y = y
-    @type = type
+  constructor: (@x, @y, @type, @direction)->
 
-  character: ->
-    WALL_CHARACTERS[@type]
+  character: -> WALL_CHARACTERS[@type]
 
   @WALL_TYPES: WALL_TYPES
 
