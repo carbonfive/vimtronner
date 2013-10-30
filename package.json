@@ -1,0 +1,30 @@
+{
+  "name": "vimtronner",
+  "version": "0.0.0",
+  "description": "A multi-player Vim trainer.",
+  "main": "lib/vimtronner.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/vimtronner_spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rudyjahchan/vimtronner.git"
+  },
+  "keywords": [
+    "vim",
+    "game",
+    "trainer"
+  ],
+  "author": "Rudy Jahchan",
+  "license": "GPLv2",
+  "gitHead": "9c7cc16afd1b5bace80fd886b9bbe9bc0dbaf9fc",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "coffee-script": ""
+  },
+  "dependencies": {
+  }
+}
