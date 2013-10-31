@@ -39,7 +39,11 @@ DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.LEFT] = Wall.WALL_TYPES.EA
 DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.RIGHT] = Wall.WALL_TYPES.EAST_WEST
 
 class Cycle
-  constructor: (@x, @y, @direction, @color)->
+  constructor: (attributes)->
+    @x = attributes.x
+    @y = attributes.y
+    @direction = attributes.direction
+    @color = attributes.color
     @walls = []
 
   character: ->
@@ -53,13 +57,13 @@ class Cycle
       @walls.push new Wall(@x, @y, @nextWallType(), @direction)
       switch @direction
         when directions.UP
-          @y -= 1 unless @y == 1
+          @y -= 1 unless @y == 0
         when directions.DOWN
-          @y += 1 unless @y == process.stdout.rows
+          @y += 1 unless @y == 47
         when directions.LEFT
-          @x -= 1 unless @x == 1
+          @x -= 1 unless @x == 0
         when directions.RIGHT
-          @x += 1 unless @x == process.stdout.columns
+          @x += 1 unless @x == 47
 
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y
@@ -88,5 +92,13 @@ class Cycle
   turnRight: -> @direction = directions.RIGHT unless @direction is directions.LEFT
   turnUp: -> @direction = directions.UP unless @direction is directions.DOWN
   turnDown: -> @direction = directions.DOWN unless @direction is directions.UP
+
+  toJSON: -> {
+    x: @x
+    y: @y
+    color: @color
+    direction: @direction
+    walls: (wall.toJSON() for wall in @walls)
+  }
 
 module.exports = Cycle

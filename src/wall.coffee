@@ -24,4 +24,11 @@ class Wall
 
   @WALL_TYPES: WALL_TYPES
 
+  toJSON: -> {
+    x: @x
+    y: @y
+    type: @type
+    direction: @direction
+  }
+
 module.exports = Wall
