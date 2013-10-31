@@ -11,7 +11,7 @@ ARENA_WALL_CHARS = {
   BOTTOM_RIGHT_CORNER: buffer(0xE2, 0x95, 0x9D)
 }
 
-class VimTronnerBoard
+class Board
   constructor: ->
     @cycles = []
 
@@ -65,4 +65,4 @@ class VimTronnerBoard
       screen.moveTo(cycle.x + 1, cycle.y + 1)
       process.stdout.write cycle.character()
 
-module.exports = VimTronnerBoard
+module.exports = Board

@@ -1,8 +1,8 @@
 socket = require('socket.io-client').connect('http://localhost:8000')
 screen = require './screen'
-VimTronnerBoard = require './vimtronnerboard'
+Board = require './board'
 
-vimTronnerBoard = new VimTronnerBoard
+board = new Board
 
 socket.on 'connect', ->
   onSigInt = ->
@@ -22,5 +22,5 @@ socket.on 'connect', ->
         socket.emit 'movement', chunk[0]
 
   socket.on 'game', (game) ->
-    vimTronnerBoard.loadState(game)
-    vimTronnerBoard.render()
+    board.loadState(game)
+    board.render()
