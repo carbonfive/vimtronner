@@ -1,5 +1,9 @@
 socket = require('socket.io-client').connect('http://localhost:8000')
+VimTronnerBoard = require './vimtronnerboard'
+
+vimTronnerBoard = new VimTronnerBoard
 
 socket.on 'connect', ->
   socket.on 'game', (game) ->
-    console.log game
+    vimTronnerBoard.loadState(game)
+    vimTronnerBoard.render()

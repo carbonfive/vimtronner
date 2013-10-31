@@ -13,7 +13,12 @@ class Game extends EventEmitter
     @state = Game.STATES.WAITING
 
   addCycle: ->
-    cycle = new Cycle(1,1, directions.RIGHT, 4)
+    cycle = new Cycle({
+      x: 1
+      y:1
+      direction: directions.RIGHT
+      color: 4
+    })
     @cycles.push cycle
     if @cycles.length > 0
       @start()

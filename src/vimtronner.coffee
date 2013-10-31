@@ -12,10 +12,19 @@ ARENA_WALL_CHARS = {
   BOTTOM_RIGHT_CORNER: buffer(0xE2, 0x95, 0x9D)
 }
 
-
 cycles = []
-cycles.push new Cycle(1, 1, 1, 4)
-cycles.push new Cycle(47, 47, directions.LEFT, 1)
+cycles.push new Cycle({
+  x: 1
+  y: 1
+  direction: directions.RIGHT
+  color: 4
+})
+cycles.push new Cycle({
+  x: 47
+  y: 47
+  direction: directions.LEFT
+  color: 1
+})
 
 onSigInt = ->
   screen.clear()

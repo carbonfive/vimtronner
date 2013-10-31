@@ -45,6 +45,8 @@ class Cycle
     @direction = attributes.direction
     @color = attributes.color
     @walls = []
+    for wall in attributes.walls
+      @walls.push new Wall(wall)
 
   character: ->
     if @state == CYCLE_STATES.EXPLODING
@@ -54,7 +56,12 @@ class Cycle
 
   move: ->
     unless @state == CYCLE_STATES.EXPLODING
-      @walls.push new Wall(@x, @y, @nextWallType(), @direction)
+      @walls.push new Wall({
+        x: @x
+        y: @y
+        type: @nextWallType()
+        direction: @direction
+      })
       switch @direction
         when directions.UP
           @y -= 1 unless @y == 0
