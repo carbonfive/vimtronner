@@ -18,12 +18,14 @@ cycles.push new Cycle({
   y: 1
   direction: directions.RIGHT
   color: 4
+  walls: []
 })
 cycles.push new Cycle({
   x: 47
   y: 47
   direction: directions.LEFT
   color: 1
+  walls: []
 })
 
 onSigInt = ->

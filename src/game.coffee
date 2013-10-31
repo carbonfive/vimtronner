@@ -8,19 +8,31 @@ class Game extends EventEmitter
     STARTED: 1
   }
 
+  @PLAYER_ATTRIBUTES: [
+    {
+      x: 1
+      y: 1
+      direction: directions.RIGHT
+      color: 4
+      walls: []
+    }
+    {
+      x: 47
+      y: 47
+      direction: directions.LEFT
+      color: 2
+      walls: []
+    }
+  ]
+
   constructor: ->
     @cycles = []
     @state = Game.STATES.WAITING
 
   addCycle: ->
-    cycle = new Cycle({
-      x: 1
-      y:1
-      direction: directions.RIGHT
-      color: 4
-    })
+    cycle = new Cycle(Game.PLAYER_ATTRIBUTES[@cycles.length])
     @cycles.push cycle
-    if @cycles.length > 0
+    if @cycles.length > 1
       @start()
     cycle
 
@@ -33,6 +45,17 @@ class Game extends EventEmitter
   start: ->
     @state = Game.STATES.STARTED
     @interval = setInterval @loop, 100
+
+  moveCycle: (cycle, movement) ->
+    switch movement
+      when 106
+        cycle.turnDown()
+      when 107
+        cycle.turnUp()
+      when 104
+        cycle.turnLeft()
+      when 108
+        cycle.turnRight()
 
   loop: =>
     for cycle in @cycles

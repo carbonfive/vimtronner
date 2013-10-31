@@ -9,5 +9,8 @@ io = require('socket.io').listen 8000
 io.sockets.on 'connection', (socket) ->
   cycle = game.addCycle()
 
+  socket.on 'movement', (movement)->
+    game.moveCycle(cycle, movement)
+
   socket.on 'disconnect', ->
     game.removeCycle cycle
