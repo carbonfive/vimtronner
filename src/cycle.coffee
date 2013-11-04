@@ -45,6 +45,7 @@ class Cycle
     @direction = attributes.direction
     @color = attributes.color
     @walls = []
+    @state = attributes.state ? CYCLE_STATES.RACING
     for wall in attributes.walls
       @walls.push new Wall(wall)
 
@@ -104,6 +105,7 @@ class Cycle
     x: @x
     y: @y
     color: @color
+    state: @state
     direction: @direction
     walls: (wall.toJSON() for wall in @walls)
   }
