@@ -1,8 +1,11 @@
-socket = require('socket.io-client').connect('http://localhost:8000')
+socket = require('socket.io-client').connect('http://192.168.7.21:8000')
 screen = require './screen'
 Board = require './board'
 
 board = new Board
+
+screen.clear()
+screen.hideCursor()
 
 socket.on 'connect', ->
   onSigInt = ->
