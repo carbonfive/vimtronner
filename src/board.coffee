@@ -12,10 +12,17 @@ ARENA_WALL_CHARS = {
 }
 
 class Board
+  @STATES: {
+    WAITING: 0
+    STARTED: 1
+  }
+
   constructor: ->
     @cycles = []
+    @state = Board.STATES.WAITING
 
   loadState: (gameState)->
+    @state = gameState.state
     @setCycles(gameState.cycles)
 
   setCycles: (cycles) ->
@@ -25,9 +32,12 @@ class Board
 
   render: ->
     screen.clear()
-    @renderArena()
-    @renderWalls()
-    @renderCycles()
+    if @state == Board.STATES.WAITING
+      @renderWaitScreen()
+    else
+      @renderArena()
+      @renderWalls()
+      @renderCycles()
 
   renderArena: ->
     screen.setForegroundColor 3
@@ -51,6 +61,12 @@ class Board
     for y in [49..2]
       screen.moveTo 1, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
+
+  renderWaitScreen: ->
+    @renderArena()
+    screen.setForegroundColor 3
+    screen.moveTo(12,25)
+    process.stdout.write 'Player 1 waiting...'
 
   renderWalls: ->
     for cycle in @cycles

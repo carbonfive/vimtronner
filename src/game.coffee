@@ -34,6 +34,8 @@ class Game extends EventEmitter
     @cycles.push cycle
     if @cycles.length > 1
       @start()
+    else
+      @emit 'game', @toJSON()
     cycle
 
   removeCycle: (cycle)->
@@ -68,6 +70,7 @@ class Game extends EventEmitter
     clearInterval @interval
 
   toJSON: -> {
+    state: @state
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 
