@@ -14,7 +14,8 @@ ARENA_WALL_CHARS = {
 class Board
   @STATES: {
     WAITING: 0
-    STARTED: 1
+    COUNTDOWN: 1
+    STARTED: 2
   }
 
   constructor: ->
@@ -23,6 +24,7 @@ class Board
 
   loadState: (gameState)->
     @state = gameState.state
+    @count = gameState.count
     @setCycles(gameState.cycles)
 
   setCycles: (cycles) ->
@@ -34,6 +36,8 @@ class Board
     screen.clear()
     if @state == Board.STATES.WAITING
       @renderWaitScreen()
+    else if @state == Board.STATES.COUNTDOWN
+      @renderCountdown()
     else
       @renderArena()
       @renderWalls()
@@ -67,6 +71,16 @@ class Board
     screen.setForegroundColor 3
     screen.moveTo(12,25)
     process.stdout.write 'Player 1 waiting...'
+
+  renderCountdown: ->
+    @renderArena()
+    @renderCycles()
+    @renderCount()
+
+  renderCount: ->
+    screen.setForegroundColor 3
+    screen.moveTo(12,25)
+    process.stdout.write "#{@count}"
 
   renderWalls: ->
     for cycle in @cycles
