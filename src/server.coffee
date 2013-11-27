@@ -1,16 +1,37 @@
 Game = require('./game')
+socketio = require 'socket.io'
 
-game = new Game
-game.addListener 'game', (gameJSON) ->
-  io.sockets.emit 'game', gameJSON
+class Server
+  constructor: (@port=8000)->
 
-io = require('socket.io').listen 8000
+  start: ->
+    @launchGame()
+    @listen()
 
-io.sockets.on 'connection', (socket) ->
-  cycle = game.addCycle()
+  launchGame: ->
+    @game = new Game
+    @game.addListener 'game', @onGameChange
 
-  socket.on 'movement', (movement)->
-    game.moveCycle(cycle, movement)
+  onGameChange: (gameJSON)=>
+    @io.sockets.emit 'game', gameJSON
 
-  socket.on 'disconnect', ->
-    game.removeCycle cycle
+  listen: ->
+    @io = socketio.listen @port
+    @io.on 'connection', @onConnection
+
+  onConnection: (socket)=>
+    new ClientSocket(socket, @game)
+
+class ClientSocket
+  constructor: (@socket, @game)->
+    @cycle = @game.addCycle()
+    @socket.on 'movement', @onMovement
+    @socket.on 'disconnect', @onDisconnect
+
+  onMovement: (movement)=>
+    @game.moveCycle(@cycle, movement)
+
+  onDisconnect: =>
+    @game.removeCycle @cycle
+
+module.exports = Server
