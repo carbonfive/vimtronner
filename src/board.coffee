@@ -12,10 +12,22 @@ ARENA_WALL_CHARS = {
 }
 
 class Board
+  @STATES: {
+    WAITING: 0
+    COUNTDOWN: 1
+    STARTED: 2
+  }
+
   constructor: ->
     @cycles = []
+    @state = Board.STATES.WAITING
+    @countString = ''
 
   loadState: (gameState)->
+    @state = gameState.state
+    if gameState.count != @lastCount && @state == Board.STATES.COUNTDOWN
+      @lastCount = gameState.count
+      @countString += "#{gameState.count}..."
     @setCycles(gameState.cycles)
 
   setCycles: (cycles) ->
@@ -25,9 +37,14 @@ class Board
 
   render: ->
     screen.clear()
-    @renderArena()
-    @renderWalls()
-    @renderCycles()
+    if @state == Board.STATES.WAITING
+      @renderWaitScreen()
+    else if @state == Board.STATES.COUNTDOWN
+      @renderCountdown()
+    else
+      @renderArena()
+      @renderWalls()
+      @renderCycles()
 
   renderArena: ->
     screen.setForegroundColor 3
@@ -51,6 +68,39 @@ class Board
     for y in [49..2]
       screen.moveTo 1, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
+
+  renderWaitScreen: ->
+    @renderArena()
+    screen.setForegroundColor 3
+    screen.moveTo(12,25)
+    process.stdout.write 'Player 1 waiting...'
+
+  renderCountdown: ->
+    @renderArena()
+    @renderCycles()
+    @renderPlayerNames()
+    @renderCount()
+
+  renderPlayerNames: ->
+    for cycle, index in @cycles
+      screen.setForegroundColor cycle.color
+      [nameX, nameY] = @namePlacement(cycle)
+      screen.moveTo(nameX, nameY)
+      process.stdout.write "Player #{index + 1}"
+
+
+  namePlacement: (cycle) ->
+    if cycle.x > 25
+      nameX = cycle.x - 10
+    else
+      nameX = cycle.x + 5
+    nameY = cycle.y + 1
+    [nameX, nameY]
+
+  renderCount: ->
+    screen.setForegroundColor 3
+    screen.moveTo(20,25)
+    process.stdout.write @countString
 
   renderWalls: ->
     for cycle in @cycles

@@ -5,7 +5,8 @@ Cycle = require './cycle'
 class Game extends EventEmitter
   @STATES: {
     WAITING: 0
-    STARTED: 1
+    COUNTDOWN: 1
+    STARTED: 2
   }
 
   @PLAYER_ATTRIBUTES: [
@@ -28,12 +29,15 @@ class Game extends EventEmitter
   constructor: ->
     @cycles = []
     @state = Game.STATES.WAITING
+    @count = 3
 
   addCycle: ->
     cycle = new Cycle(Game.PLAYER_ATTRIBUTES[@cycles.length])
     @cycles.push cycle
     if @cycles.length > 1
       @start()
+    else
+      @emit 'game', @toJSON()
     cycle
 
   removeCycle: (cycle)->
@@ -43,8 +47,9 @@ class Game extends EventEmitter
       @stop()
 
   start: ->
-    @state = Game.STATES.STARTED
-    @interval = setInterval @loop, 100
+    @state = Game.STATES.COUNTDOWN
+    @count_interval = setInterval @countdown, 1000
+    @game_loop = setInterval @loop, 100
 
   moveCycle: (cycle, movement) ->
     switch movement
@@ -58,16 +63,25 @@ class Game extends EventEmitter
         cycle.turnRight()
 
   loop: =>
-    for cycle in @cycles
-      cycle.move()
-      cycle.checkCollisions(@cycles)
+    if @state == Game.STATES.STARTED
+      for cycle in @cycles
+        cycle.move()
+        cycle.checkCollisions(@cycles)
     @emit 'game', @toJSON()
+
+  countdown: =>
+    @count--
+    if @count == 0
+      clearInterval @count_interval
+      @state = Game.STATES.STARTED
 
   stop: ->
     @state = Game.STATES.WAITING
-    clearInterval @interval
+    clearInterval @game_loop
 
   toJSON: -> {
+    state: @state
+    count: @count
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 
