@@ -21,10 +21,13 @@ class Board
   constructor: ->
     @cycles = []
     @state = Board.STATES.WAITING
+    @countString = ''
 
   loadState: (gameState)->
     @state = gameState.state
-    @count = gameState.count
+    if gameState.count != @lastCount && @state == Board.STATES.COUNTDOWN
+      @lastCount = gameState.count
+      @countString += "#{gameState.count}..."
     @setCycles(gameState.cycles)
 
   setCycles: (cycles) ->
@@ -75,12 +78,29 @@ class Board
   renderCountdown: ->
     @renderArena()
     @renderCycles()
+    @renderPlayerNames()
     @renderCount()
+
+  renderPlayerNames: ->
+    for cycle, index in @cycles
+      screen.setForegroundColor cycle.color
+      [nameX, nameY] = @namePlacement(cycle)
+      screen.moveTo(nameX, nameY)
+      process.stdout.write "Player #{index + 1}"
+
+
+  namePlacement: (cycle) ->
+    if cycle.x > 25
+      nameX = cycle.x - 10
+    else
+      nameX = cycle.x + 5
+    nameY = cycle.y + 1
+    [nameX, nameY]
 
   renderCount: ->
     screen.setForegroundColor 3
-    screen.moveTo(12,25)
-    process.stdout.write "#{@count}"
+    screen.moveTo(20,25)
+    process.stdout.write @countString
 
   renderWalls: ->
     for cycle in @cycles
