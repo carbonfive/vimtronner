@@ -1,0 +1,24 @@
+#!/usr/bin/env coffee
+# vim:ft=coffee ts=2 sw=2 et :
+# -*- mode:coffee -*-
+
+program = require 'commander'
+fs = require 'fs'
+Server = require '../src/server'
+Client = require '../src/client'
+
+program
+  .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+  .option('-S, --server', 'launches a server')
+  .option('-C, --client', 'launches a client')
+  .option('-A, --address <address>', 'the address to connect the client', '127.0.0.1')
+  .option('-P, --port <port>', 'the port to launch the server or connect the client', 8000)
+  .parse(process.argv)
+
+if program.server
+  server = new Server(program.port)
+  server.start()
+
+if program.client
+  client = new Client(program.address, program.port)
+  client.start()
