@@ -7,6 +7,7 @@ class Game extends EventEmitter
     WAITING: 0
     COUNTDOWN: 1
     STARTED: 2
+    FINISHED: 3
   }
 
   @PLAYER_ATTRIBUTES: [
@@ -43,13 +44,13 @@ class Game extends EventEmitter
   removeCycle: (cycle)->
     index = @cycles.indexOf cycle
     @cycles.splice index, 1
-    if @cycles.length < 1
+    if @cycles.length <= 1
       @stop()
 
   start: ->
     @state = Game.STATES.COUNTDOWN
-    @count_interval = setInterval @countdown, 1000
-    @game_loop = setInterval @loop, 100
+    @countInterval = setInterval @countdown, 1000
+    @gameLoop = setInterval @loop, 100
 
   moveCycle: (cycle, movement) ->
     switch movement
@@ -67,17 +68,20 @@ class Game extends EventEmitter
       for cycle in @cycles
         cycle.move()
         cycle.checkCollisions(@cycles)
+        if cycle.state == 1
+          @removeCycle(cycle)
     @emit 'game', @
 
   countdown: =>
     @count--
     if @count == 0
-      clearInterval @count_interval
+      clearInterval @countInterval
       @state = Game.STATES.STARTED
 
   stop: ->
-    @state = Game.STATES.WAITING
-    clearInterval @game_loop
+    @state = Game.STATES.FINISHED
+    clearInterval @gameLoop
+    @emit 'game', @
     @emit 'stopped', @
 
   toJSON: -> {
