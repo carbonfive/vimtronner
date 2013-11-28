@@ -16,6 +16,7 @@ class Board
     WAITING: 0
     COUNTDOWN: 1
     STARTED: 2
+    FINISHED: 3
   }
 
   constructor: ->
@@ -41,6 +42,8 @@ class Board
       @renderWaitScreen()
     else if @state == Board.STATES.COUNTDOWN
       @renderCountdown()
+    else if @state == Board.STATES.FINISHED
+      @renderWinner()
     else
       @renderArena()
       @renderWalls()
@@ -88,6 +91,16 @@ class Board
       screen.moveTo(nameX, nameY)
       process.stdout.write "Player #{index + 1}"
 
+  renderWinner: ->
+    @renderArena()
+    @renderCycles()
+    @renderWinnerMessage()
+
+  renderWinnerMessage: ->
+    messageX = @cycles[0].x - 1
+    messageY = @cycles[0].y
+    screen.moveTo(messageX, messageY)
+    process.stdout.write "Winner!!!"
 
   namePlacement: (cycle) ->
     if cycle.x > 25
