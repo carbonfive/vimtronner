@@ -26,7 +26,7 @@ class Game extends EventEmitter
     }
   ]
 
-  constructor: ->
+  constructor: (@name=nil)->
     @cycles = []
     @state = Game.STATES.WAITING
     @count = 3
@@ -37,7 +37,7 @@ class Game extends EventEmitter
     if @cycles.length > 1
       @start()
     else
-      @emit 'game', @toJSON()
+      @emit 'game', @
     cycle
 
   removeCycle: (cycle)->
@@ -67,7 +67,7 @@ class Game extends EventEmitter
       for cycle in @cycles
         cycle.move()
         cycle.checkCollisions(@cycles)
-    @emit 'game', @toJSON()
+    @emit 'game', @
 
   countdown: =>
     @count--
@@ -78,8 +78,10 @@ class Game extends EventEmitter
   stop: ->
     @state = Game.STATES.WAITING
     clearInterval @game_loop
+    @emit 'stopped', @
 
   toJSON: -> {
+    name: @name
     state: @state
     count: @count
     cycles: (cycle.toJSON() for cycle in @cycles)
