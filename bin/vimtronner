@@ -13,12 +13,16 @@ program
   .option('-C, --client', 'launches a client')
   .option('-A, --address <address>', 'the address to connect the client', '127.0.0.1')
   .option('-P, --port <port>', 'the port to launch the server or connect the client', 8000)
+  .option('-G, --game <game>', 'the game the client wants to join')
   .parse(process.argv)
 
 if program.server
   server = new Server(program.port)
-  server.start()
+  server.listen()
 
 if program.client
   client = new Client(program.address, program.port)
-  client.start()
+  if program.game?
+    client.join(program.game)
+  else
+    client.listGames()
