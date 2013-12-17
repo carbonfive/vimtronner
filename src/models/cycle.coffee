@@ -1,14 +1,5 @@
 directions = require './directions'
 Wall = require './wall'
-buffer = require './buffer'
-
-CYCLE_CHAR = []
-CYCLE_CHAR[directions.UP] = buffer(0xe2, 0x95, 0xbf)
-CYCLE_CHAR[directions.DOWN] = buffer(0xE2, 0x95, 0xBD)
-CYCLE_CHAR[directions.LEFT] = buffer(0xE2, 0x95, 0xBE)
-CYCLE_CHAR[directions.RIGHT] = buffer(0xE2, 0x95, 0xBC)
-
-CYCLE_EXPLOSION = buffer(0xE2, 0xAC, 0xA4)
 
 CYCLE_STATES = {
   RACING: 0,
@@ -39,7 +30,10 @@ DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.LEFT] = Wall.WALL_TYPES.EA
 DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.RIGHT] = Wall.WALL_TYPES.EAST_WEST
 
 class Cycle
+  @STATES: CYCLE_STATES
+
   constructor: (attributes)->
+    @number = attributes.number
     @x = attributes.x
     @y = attributes.y
     @direction = attributes.direction
@@ -48,12 +42,6 @@ class Cycle
     @state = attributes.state ? CYCLE_STATES.RACING
     for wall in attributes.walls
       @walls.push new Wall(wall)
-
-  character: ->
-    if @state == CYCLE_STATES.EXPLODING
-      CYCLE_EXPLOSION
-    else
-      CYCLE_CHAR[@direction]
 
   move: ->
     unless @state == CYCLE_STATES.EXPLODING
@@ -102,6 +90,7 @@ class Cycle
   turnDown: -> @direction = directions.DOWN unless @direction is directions.UP
 
   toJSON: -> {
+    number: @number
     x: @x
     y: @y
     color: @color

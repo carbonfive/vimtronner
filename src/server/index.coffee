@@ -1,4 +1,4 @@
-Game = require('./game')
+Game = require('../models/game')
 socketio = require 'socket.io'
 
 class Server

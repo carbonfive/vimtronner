@@ -12,6 +12,7 @@ class Game extends EventEmitter
 
   @PLAYER_ATTRIBUTES: [
     {
+      number: 1
       x: 1
       y: 1
       direction: directions.RIGHT
@@ -19,6 +20,7 @@ class Game extends EventEmitter
       walls: []
     }
     {
+      number: 2
       x: 47
       y: 47
       direction: directions.LEFT
@@ -66,9 +68,9 @@ class Game extends EventEmitter
   loop: =>
     if @state == Game.STATES.STARTED
       for cycle in @cycles
-        cycle.move()
-        cycle.checkCollisions(@cycles)
-        if cycle.state == 1
+        cycle?.move()
+        cycle?.checkCollisions(@cycles)
+        if cycle?.state == 1
           @removeCycle(cycle)
     @emit 'game', @
 

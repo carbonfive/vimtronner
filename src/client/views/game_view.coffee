@@ -1,6 +1,7 @@
-screen = require './screen'
-buffer = require './buffer'
-Cycle = require './cycle'
+screen = require '../screen'
+buffer = require '../buffer'
+Game = require '../../models/game'
+CycleView = require './cycle_view'
 
 ARENA_WALL_CHARS = {
   HORIZONTAL: buffer(0xE2, 0x95, 0x90)
@@ -11,43 +12,37 @@ ARENA_WALL_CHARS = {
   BOTTOM_RIGHT_CORNER: buffer(0xE2, 0x95, 0x9D)
 }
 
-class Board
-  @STATES: {
-    WAITING: 0
-    COUNTDOWN: 1
-    STARTED: 2
-    FINISHED: 3
-  }
+class GameView
 
   constructor: ->
-    @cycles = []
-    @state = Board.STATES.WAITING
+    @cycleViews = []
     @countString = ''
 
-  loadState: (gameState)->
-    @state = gameState.state
-    if gameState.count != @lastCount && @state == Board.STATES.COUNTDOWN
-      @lastCount = gameState.count
-      @countString += "#{gameState.count}..."
-    @setCycles(gameState.cycles)
+    Object.defineProperty @, 'state', get: @_state
 
-  setCycles: (cycles) ->
-    @cycles.length = 0
-    for cycle in cycles
-      @cycles.push new Cycle(cycle)
+  _state: => @game?.state
+
+  setGame: (game)->
+    @game = game
+    if @game.count != @lastCount && @state == Game.STATES.COUNTDOWN
+      @lastCount = @game.count
+      @countString += "#{@game.count}..."
+    @generateCycleViews()
+
+  generateCycleViews: ->
+    @cycleViews = (new CycleView(cycle, @game) for cycle in @game.cycles)
 
   render: ->
     screen.clear()
-    if @state == Board.STATES.WAITING
+    if @state == Game.STATES.WAITING
       @renderWaitScreen()
-    else if @state == Board.STATES.COUNTDOWN
+    else if @state == Game.STATES.COUNTDOWN
       @renderCountdown()
-    else if @state == Board.STATES.FINISHED
+    else if @state == Game.STATES.FINISHED
       @renderWinner()
     else
       @renderArena()
-      @renderWalls()
-      @renderCycles()
+      @renderCycleViews()
 
   renderArena: ->
     screen.setForegroundColor 3
@@ -80,52 +75,26 @@ class Board
 
   renderCountdown: ->
     @renderArena()
-    @renderCycles()
-    @renderPlayerNames()
+    @renderCycleViews()
     @renderCount()
-
-  renderPlayerNames: ->
-    for cycle, index in @cycles
-      screen.setForegroundColor cycle.color
-      [nameX, nameY] = @namePlacement(cycle)
-      screen.moveTo(nameX, nameY)
-      process.stdout.write "Player #{index + 1}"
 
   renderWinner: ->
     @renderArena()
-    @renderCycles()
+    @renderCycleViews()
     @renderWinnerMessage()
 
   renderWinnerMessage: ->
-    messageX = @cycles[0].x - 1
-    messageY = @cycles[0].y
+    messageX = @cycleViews[0].cycle.x - 1
+    messageY = @cycleViews[0].cycle.y
     screen.moveTo(messageX, messageY)
     process.stdout.write "Winner!!!"
-
-  namePlacement: (cycle) ->
-    if cycle.x > 25
-      nameX = cycle.x - 10
-    else
-      nameX = cycle.x + 5
-    nameY = cycle.y + 1
-    [nameX, nameY]
 
   renderCount: ->
     screen.setForegroundColor 3
     screen.moveTo(20,25)
     process.stdout.write @countString
 
-  renderWalls: ->
-    for cycle in @cycles
-      screen.setForegroundColor cycle.color
-      for wall in cycle.walls
-        screen.moveTo(wall.x + 1, wall.y + 1)
-        process.stdout.write wall.character()
+  renderCycleViews: ->
+    cycleView.render() for cycleView in @cycleViews
 
-  renderCycles: ->
-    for cycle in @cycles
-      screen.setForegroundColor cycle.color
-      screen.moveTo(cycle.x + 1, cycle.y + 1)
-      process.stdout.write cycle.character()
-
-module.exports = Board
+module.exports = GameView

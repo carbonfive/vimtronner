@@ -1,10 +1,10 @@
 socketio = require('socket.io-client')
 screen = require './screen'
-Board = require './board'
+GameView = require './views/game_view'
 
 class Client
   constructor: (@address="127.0.0.1", @port=8000)->
-    @board = board = new Board
+    @gameView = gameView = new GameView
 
   join: (@game)->
     @clearScreen()
@@ -42,8 +42,8 @@ class Client
     process.nextTick process.exit
 
   onGameUpdate: (game)=>
-    @board.loadState(game)
-    @board.render()
+    @gameView.setGame(game)
+    @gameView.render()
 
   andListGames: =>
     @socket.on 'games', @onGames
