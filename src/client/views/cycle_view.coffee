@@ -40,6 +40,9 @@ class CycleView
     if @game.state == Game.STATES.COUNTDOWN
       @renderName()
 
+    if @cycle.state == Cycle.STATES.WINNER
+      @renderWinnerMessage()
+
   generateWallViews: ->
     @wallViews = (new WallView(wall) for wall in @cycle.walls)
 
@@ -52,5 +55,11 @@ class CycleView
 
   _nameX: => if @cycle.x > 25 then @cycle.x - 10 else @cycle.x + 5
   _nameY: => @cycle.y + 1
+
+  renderWinnerMessage: ->
+    messageX = @cycle.x - 1
+    messageY = @cycle.y
+    screen.moveTo(messageX, messageY)
+    process.stdout.write "Winner!!!"
 
 module.exports = CycleView

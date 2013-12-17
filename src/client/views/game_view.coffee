@@ -38,8 +38,6 @@ class GameView
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
       @renderCountdown()
-    else if @state == Game.STATES.FINISHED
-      @renderWinner()
     else
       @renderArena()
       @renderCycleViews()
@@ -77,17 +75,6 @@ class GameView
     @renderArena()
     @renderCycleViews()
     @renderCount()
-
-  renderWinner: ->
-    @renderArena()
-    @renderCycleViews()
-    @renderWinnerMessage()
-
-  renderWinnerMessage: ->
-    messageX = @cycleViews[0].cycle.x - 1
-    messageY = @cycleViews[0].cycle.y
-    screen.moveTo(messageX, messageY)
-    process.stdout.write "Winner!!!"
 
   renderCount: ->
     screen.setForegroundColor 3

@@ -2,9 +2,10 @@ directions = require './directions'
 Wall = require './wall'
 
 CYCLE_STATES = {
-  RACING: 0,
-  EXPLODING: 1,
+  RACING: 0
+  EXPLODING: 1
   DEAD: 2
+  WINNER: 3
 }
 
 DIRECTIONS_TO_WALL_TYPES = {}
@@ -88,6 +89,9 @@ class Cycle
   turnRight: -> @direction = directions.RIGHT unless @direction is directions.LEFT
   turnUp: -> @direction = directions.UP unless @direction is directions.DOWN
   turnDown: -> @direction = directions.DOWN unless @direction is directions.UP
+
+  makeWinner: ->
+    @state = Cycle.STATES.WINNER
 
   toJSON: -> {
     number: @number

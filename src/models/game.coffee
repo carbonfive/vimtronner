@@ -37,7 +37,7 @@ class Game extends EventEmitter
   addCycle: ->
     cycle = new Cycle(Game.PLAYER_ATTRIBUTES[@cycles.length])
     @cycles.push cycle
-    if @cycles.length > 1
+    if @activeCycleCount() > 1
       @start()
     else
       @emit 'game', @
@@ -46,8 +46,17 @@ class Game extends EventEmitter
   removeCycle: (cycle)->
     index = @cycles.indexOf cycle
     @cycles.splice index, 1
-    if @cycles.length <= 1
+    @checkForWinner()
+
+  checkForWinner: ->
+    if @activeCycleCount() <= 1
       @stop()
+
+  activeCycleCount: ->
+    count = 0
+    count++ for cycle in @cycles when cycle.state == Cycle.STATES.RACING
+    console.log 'Count is', count
+    count
 
   start: ->
     @state = Game.STATES.COUNTDOWN
@@ -70,8 +79,7 @@ class Game extends EventEmitter
       for cycle in @cycles
         cycle?.move()
         cycle?.checkCollisions(@cycles)
-        if cycle?.state == 1
-          @removeCycle(cycle)
+      @checkForWinner()
     @emit 'game', @
 
   countdown: =>
@@ -81,10 +89,14 @@ class Game extends EventEmitter
       @state = Game.STATES.STARTED
 
   stop: ->
-    @state = Game.STATES.FINISHED
     clearInterval @gameLoop
+    @state = Game.STATES.FINISHED
+    @determineWinner()
     @emit 'game', @
     @emit 'stopped', @
+
+  determineWinner: ->
+    cycle.makeWinner() for cycle in @cycles when cycle.state == Cycle.STATES.RACING
 
   toJSON: -> {
     name: @name
