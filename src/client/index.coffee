@@ -1,6 +1,7 @@
 socketio = require('socket.io-client')
 screen = require './screen'
 GameView = require './views/game_view'
+GameListView = require './views/game_list_view'
 
 class Client
   constructor: (@address="127.0.0.1", @port=8000)->
@@ -46,11 +47,13 @@ class Client
     @gameView.render()
 
   andListGames: =>
+    @gameListView = new GameListView
     @socket.on 'games', @onGames
     @socket.emit 'list'
 
   onGames: (games)=>
-    console.log games
+    @gameListView.addGames(games)
+    @gameListView.render()
     @socket.disconnect()
 
 module.exports = Client
