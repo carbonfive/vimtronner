@@ -8,14 +8,26 @@ class GameListView
     @activeGames.push games
 
   render: ->
+    @renderHeader()
+    @renderGames()
+    @renderFooter()
+
+  renderHeader: ->
     console.log "** V I M T R O N N E R **"
     console.log "Current Games:"
-    for game in @activeGames
-      game = game[0]
-      console.log "#{game.name}: #{@translateState(game.state)}"
+    console.log "-----"
+
+  renderGames: ->
+    for game in @activeGames[0]
+      console.log "Name: #{game.name}"
+      state = @translateState(game.state)
+      console.log "Status: #{state}"
       console.log "#{game.cycles.length} cycle(s)"
       console.log "-----"
-    console.log "***************"
+
+  renderFooter: ->
+    console.log "*************************"
+    console.log "Run 'vimtronner -C -G <game name>' to join."
 
   translateState: (stateNumber) ->
     switch stateNumber
