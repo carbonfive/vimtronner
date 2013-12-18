@@ -1,0 +1,3 @@
+--recursive
+--compilers coffee:coffee-script
+--require test/common

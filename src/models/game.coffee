@@ -55,7 +55,6 @@ class Game extends EventEmitter
   activeCycleCount: ->
     count = 0
     count++ for cycle in @cycles when cycle.state == Cycle.STATES.RACING
-    console.log 'Count is', count
     count
 
   start: ->
