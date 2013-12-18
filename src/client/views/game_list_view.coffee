@@ -1,11 +1,8 @@
 Game = require '../../models/game'
 
 class GameListView
-  constructor: ->
-    @activeGames = []
-
   addGames: (games) ->
-    @activeGames.push games
+    @activeGames = games
 
   render: ->
     @renderHeader()
@@ -18,7 +15,7 @@ class GameListView
     console.log "-----"
 
   renderGames: ->
-    for game in @activeGames[0]
+    for game in @activeGames
       console.log "Name: #{game.name}"
       state = @translateState(game.state)
       console.log "Status: #{state}"
