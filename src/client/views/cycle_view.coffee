@@ -29,7 +29,10 @@ class CycleView
 
   character: ->
     if @cycle.state == Cycle.STATES.EXPLODING
-      CYCLE_EXPLOSION
+      explosionIndex = @cycle.explosionFrame % 3
+      CYCLE_EXPLOSION[explosionIndex]
+    else if @cycle.state == Cycle.STATES.DEAD
+      CYCLE_EXPLODED
     else
       CYCLE_CHAR[@cycle.direction]
 
