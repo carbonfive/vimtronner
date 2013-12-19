@@ -33,16 +33,28 @@ DIRECTIONS_TO_WALL_TYPES[directions.RIGHT][directions.RIGHT] = Wall.WALL_TYPES.E
 class Cycle
   @STATES: CYCLE_STATES
 
-  constructor: (attributes)->
+  constructor: (attributes={})->
     @number = attributes.number
     @x = attributes.x
     @y = attributes.y
     @direction = attributes.direction
     @color = attributes.color
-    @walls = []
     @state = attributes.state ? CYCLE_STATES.RACING
-    for wall in attributes.walls
-      @walls.push new Wall(wall)
+    @walls = if attributes.walls?
+      (new Wall(wall) for wall in attributes.walls)
+    else
+      []
+
+  navigate: (movement) ->
+    switch movement
+      when 106
+        @turnDown()
+      when 107
+        @turnUp()
+      when 104
+        @turnLeft()
+      when 108
+        @turnRight()
 
   move: ->
     unless @state == CYCLE_STATES.EXPLODING
