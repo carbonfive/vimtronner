@@ -28,17 +28,21 @@ class Client
     process.stdin.resume()
     process.stdin.on 'data', @onData
     @socket.on 'game', @onGameUpdate
+    @socket.on 'error', @showErrorMessage
     @socket.emit 'join', @game
 
   onData: (chunk)=>
     switch chunk[0]
       when 3
-        process.kill process.pid, 'SIGINT'
+        @quit()
+        screen.clear()
       else
         @socket.emit 'movement', chunk[0]
 
+  quit: ->
+    process.kill process.pid, 'SIGINT'
+
   onSigInt: =>
-    screen.clear()
     screen.showCursor()
     process.nextTick process.exit
 
@@ -55,5 +59,9 @@ class Client
     @gameListView.addGames(games)
     @gameListView.render()
     @socket.disconnect()
+
+  showErrorMessage: (message) =>
+    console.log message
+    @quit()
 
 module.exports = Client
