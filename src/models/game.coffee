@@ -54,7 +54,7 @@ class Game extends EventEmitter
 
   activeCycleCount: ->
     count = 0
-    count++ for cycle in @cycles when cycle.state == Cycle.STATES.RACING
+    count++ for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
     count
 
   start: ->
@@ -65,7 +65,7 @@ class Game extends EventEmitter
   loop: =>
     if @state == Game.STATES.STARTED
       for cycle in @cycles
-        cycle?.move()
+        cycle?.step()
         cycle?.checkCollisions(@cycles)
       @checkForWinner()
     @emit 'game', @

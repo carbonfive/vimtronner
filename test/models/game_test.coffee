@@ -77,13 +77,13 @@ describe Game, ->
       it 'does not stop the game', ->
         expect(@stop).to.not.have.been.called
 
-    context 'given 1 or less active cycles', ->
+    context 'given 1 or less living cycles', ->
       beforeEach ->
         @game.cycles = [
-          { state: Cycle.STATES.EXPLODING }
+          { state: Cycle.STATES.DEAD }
           { state: Cycle.STATES.RACING }
           { state: Cycle.STATES.DEAD }
-          { state: Cycle.STATES.EXPLODING }
+          { state: Cycle.STATES.DEAD }
         ]
         @game.checkForWinner()
 
@@ -131,7 +131,7 @@ describe Game, ->
         @game.loop()
 
       it 'moves the cycles', ->
-        expect(cycle.move).to.have.been.called for cycle in @game.cycles
+        expect(cycle.step).to.have.been.called for cycle in @game.cycles
 
       it 'checks for cycle collisions', ->
         expect(cycle.checkCollisions).to.have.been.calledWith(@game.cycles) for cycle in @game.cycles
