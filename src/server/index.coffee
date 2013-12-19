@@ -48,7 +48,7 @@ class ClientSocket
     @game = null
 
   onMovement: (movement)=>
-    @game?.moveCycle(@cycle, movement)
+    @cycle.navigate(movement) if @game?
 
   onDisconnect: =>
     @onLeave()

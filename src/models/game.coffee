@@ -62,17 +62,6 @@ class Game extends EventEmitter
     @countInterval = setInterval @countdown, 1000
     @gameLoop = setInterval @loop, 100
 
-  moveCycle: (cycle, movement) ->
-    switch movement
-      when 106
-        cycle.turnDown()
-      when 107
-        cycle.turnUp()
-      when 104
-        cycle.turnLeft()
-      when 108
-        cycle.turnRight()
-
   loop: =>
     if @state == Game.STATES.STARTED
       for cycle in @cycles
