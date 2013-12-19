@@ -7,6 +7,7 @@ class Server
 
   getGame: (name) ->
     game = @games[name] = (@games[name] ? new Game(name))
+    return null if game.inProgress()
     game.addListener 'game', @onGameChange
     game.addListener 'stopped', @onGameStopped
     game
@@ -37,8 +38,11 @@ class ClientSocket
 
   onJoin: (name)=>
     @game = @server.getGame(name)
-    @socket.join @game.name
-    @cycle = @game.addCycle()
+    if @game?
+      @socket.join @game.name
+      @cycle = @game.addCycle()
+    else
+      @socket.emit('error', "Game '#{name}' is already in progress.")
 
   onLeave: =>
     if @game?
