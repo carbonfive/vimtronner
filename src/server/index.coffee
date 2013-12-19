@@ -1,4 +1,5 @@
-Game = require('../models/game')
+Game = require '../models/game'
+http = require 'http'
 socketio = require 'socket.io'
 
 class Server
@@ -22,11 +23,17 @@ class Server
     delete @games[game.name]
 
   listen: ->
-    @io = socketio.listen @port
-    @io.on 'connection', @onConnection
+    @server = http.createServer @onRequest
+    @io = socketio.listen(@server)
+    @io.sockets.on 'connection', @onConnection
+    @server.listen(@port)
 
   onConnection: (socket)=>
     new ClientSocket(socket, @)
+
+  onRequest: (request, response)=>
+    response.writeHead 200
+    response.end('Hello, World!')
 
 class ClientSocket
   constructor: (@socket, @server)->
