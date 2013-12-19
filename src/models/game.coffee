@@ -97,6 +97,9 @@ class Game extends EventEmitter
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state == Cycle.STATES.RACING
 
+  inProgress: ->
+    @state != Game.STATES.WAITING
+
   toJSON: -> {
     name: @name
     state: @state
