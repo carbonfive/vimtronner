@@ -3,7 +3,7 @@ http = require 'http'
 socketio = require 'socket.io'
 
 class Server
-  constructor: (@port=8000)->
+  constructor: ()->
     @games = {}
 
   getGame: (name) ->
@@ -22,18 +22,24 @@ class Server
   onGameStopped: (game)=>
     delete @games[game.name]
 
-  listen: ->
-    @server = http.createServer @onRequest
-    @io = socketio.listen(@server)
+  listen: (@port=8000, options..., cb=(->))=>
+    collectedOptions = { log: false }
+    for option in options
+      for key, value of option
+        collectedOptions[key] = value
+    @server = http.createServer(@onRequest)
+    @io = socketio.listen(@server, collectedOptions)
     @io.sockets.on 'connection', @onConnection
-    @server.listen(@port)
+    @server.listen @port, cb
 
   onConnection: (socket)=>
     new ClientSocket(socket, @)
 
   onRequest: (request, response)=>
     response.writeHead 200
-    response.end('Hello, World!')
+    response.end 'Hello, world!'
+
+  close: (cb=(->))-> @server?.close cb
 
 class ClientSocket
   constructor: (@socket, @server)->

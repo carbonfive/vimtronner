@@ -17,8 +17,8 @@ program
   .parse(process.argv)
 
 if program.server
-  server = new Server(program.port)
-  server.listen()
+  server = new Server
+  server.listen(program.port)
 
 if program.client
   client = new Client(program.address, program.port)
