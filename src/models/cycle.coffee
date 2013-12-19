@@ -40,6 +40,7 @@ class Cycle
     @direction = attributes.direction
     @color = attributes.color
     @state = attributes.state ? CYCLE_STATES.RACING
+    @explosionFrame = 0
     @walls = if attributes.walls?
       (new Wall(wall) for wall in attributes.walls)
     else
@@ -56,8 +57,13 @@ class Cycle
       when 108
         @turnRight()
 
-  move: ->
-    unless @state == CYCLE_STATES.EXPLODING
+  step: ->
+    if @state == CYCLE_STATES.EXPLODING
+      if @explosionFrame <= 10
+        @explosionFrame++
+      else
+        @state = CYCLE_STATES.DEAD
+    else
       @walls.push new Wall({
         x: @x
         y: @y
@@ -91,7 +97,6 @@ class Cycle
   triggerCollision: ->
     @state = CYCLE_STATES.EXPLODING
     @walls.length = 0
-    @state_counter = 30
 
   nextWallType: ->
     lastWallDirection = @walls[@walls.length - 1]?.direction ? @direction
@@ -112,6 +117,7 @@ class Cycle
     color: @color
     state: @state
     direction: @direction
+    explosionFrame: @explosionFrame
     walls: (wall.toJSON() for wall in @walls)
   }
 

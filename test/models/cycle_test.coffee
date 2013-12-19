@@ -44,3 +44,21 @@ describe Cycle, ->
 
       it 'does not turn the cycle up', ->
         expect(@turnUp).to.not.have.been.called
+
+  describe '#step', ->
+    context 'given the cycle is exploding', ->
+      beforeEach ->
+        @cycle = new Cycle({state: Cycle.STATES.EXPLODING})
+
+      context 'given the cycle has been exploding for less than 30 ticks', ->
+        it 'increments the explosion frame', ->
+          @cycle.step()
+          expect(@cycle.explosionFrame).to.eq(1)
+
+      context 'given the cycle has been exploding for more than 30 ticks', ->
+        beforeEach ->
+          @cycle.explosionFrame = 31
+
+        it 'sets the state to DEAD', ->
+          @cycle.step()
+          expect(@cycle.state).to.eq(Cycle.STATES.DEAD)
