@@ -103,6 +103,7 @@ class Game extends EventEmitter
     name: @name
     state: @state
     count: @count
+    numberOfPlayers: @numberOfPlayers
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 

@@ -257,7 +257,7 @@ describe Game, ->
         @json = @game.toJSON()
 
       it 'returns the JSON with the game properties', ->
-        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count']
+        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count', 'numberOfPlayers']
 
       it 'returns the JSON for each cycle in the game', ->
         expect(@json['cycles']).to.have.members (cycle.toJSON() for cycle in @game.cycles)

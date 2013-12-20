@@ -19,7 +19,7 @@ class GameListView
       console.log "Name: #{game.name}"
       state = @translateState(game.state)
       console.log "Status: #{state}"
-      console.log "#{game.cycles.length} cycle(s)"
+      console.log "#{game.cycles.length} cycle(s) joined (#{game.numberOfPlayers} needed)"
       console.log "-----"
 
   renderFooter: ->
