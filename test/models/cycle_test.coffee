@@ -63,6 +63,22 @@ describe Cycle, ->
         it 'enters insert mode', ->
           expect(@cycle.state).to.eq Cycle.STATES.INSERTING
 
+    context 'cycle is dead', ->
+      beforeEach ->
+        @cycle.state = Cycle.STATES.DEAD
+
+      context 'given 27', ->
+        beforeEach -> @cycle.navigate(27)
+
+        it 'stays dead', ->
+          expect(@cycle.state).to.eq Cycle.STATES.DEAD
+
+      context 'given 105', ->
+        beforeEach -> @cycle.navigate(105)
+
+        it 'stays dead', ->
+          expect(@cycle.state).to.eq Cycle.STATES.DEAD
+
     context 'cycle is in insert mode', ->
       beforeEach ->
         @cycle.state = Cycle.STATES.INSERTING

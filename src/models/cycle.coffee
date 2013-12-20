@@ -50,9 +50,9 @@ class Cycle
   navigate: (movement) ->
     switch movement
       when 27
-        @state = CYCLE_STATES.RACING
+        @state = CYCLE_STATES.RACING if @active()
       when 105
-        @state = CYCLE_STATES.INSERTING
+        @state = CYCLE_STATES.INSERTING if @active()
       when 106
         @turnDown() unless @inserting()
       when 107
@@ -64,6 +64,9 @@ class Cycle
 
   inserting: ->
     @state == CYCLE_STATES.INSERTING
+
+  active: ->
+    @state == CYCLE_STATES.INSERTING or @state == CYCLE_STATES.RACING
 
   step: ->
     if @state == CYCLE_STATES.EXPLODING
