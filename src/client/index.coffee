@@ -36,8 +36,6 @@ class Client
       when 113
         @quit()
         screen.clear()
-      when 27, 105
-        @socket.emit 'toggleInsert', chunk[0]
       else
         @socket.emit 'movement', chunk[0]
 

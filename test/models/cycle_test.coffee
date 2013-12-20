@@ -51,9 +51,24 @@ describe Cycle, ->
         it 'does not turn the cycle up', ->
           expect(@turnUp).to.not.have.been.called
 
-    context 'cycle is not insert mode', ->
+      context 'given 27', ->
+        beforeEach -> @cycle.navigate(27)
+
+        it 'leaves insert mode', ->
+          expect(@cycle.state).to.eq Cycle.STATES.RACING
+
+      context 'given 105', ->
+        beforeEach -> @cycle.navigate(105)
+
+        it 'enters insert mode', ->
+          expect(@cycle.state).to.eq Cycle.STATES.INSERTING
+
+    context 'cycle is in insert mode', ->
       beforeEach ->
         @cycle.state = Cycle.STATES.INSERTING
+        @cycle.navigate(104)
+        @cycle.navigate(106)
+        @cycle.navigate(107)
         @cycle.navigate(108)
 
       it 'does not allow a change of direction', ->

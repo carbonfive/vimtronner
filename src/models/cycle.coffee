@@ -48,16 +48,22 @@ class Cycle
       []
 
   navigate: (movement) ->
-    return null if @state == CYCLE_STATES.INSERTING
     switch movement
+      when 27
+        @state = CYCLE_STATES.RACING
+      when 105
+        @state = CYCLE_STATES.INSERTING
       when 106
-        @turnDown()
+        @turnDown() unless @inserting()
       when 107
-        @turnUp()
+        @turnUp() unless @inserting()
       when 104
-        @turnLeft()
+        @turnLeft() unless @inserting()
       when 108
-        @turnRight()
+        @turnRight() unless @inserting()
+
+  inserting: ->
+    @state == CYCLE_STATES.INSERTING
 
   step: ->
     if @state == CYCLE_STATES.EXPLODING
@@ -117,12 +123,6 @@ class Cycle
 
   makeWinner: ->
     @state = Cycle.STATES.WINNER
-
-  enterInsert: ->
-    @state = Cycle.STATES.INSERTING if @state == Cycle.STATES.RACING
-
-  leaveInsert: ->
-    @state = Cycle.STATES.RACING if @state == Cycle.STATES.INSERTING
 
   toJSON: -> {
     number: @number
