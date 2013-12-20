@@ -78,17 +78,20 @@ class Cycle
         when directions.UP
           @y -= 1 unless @y == 0
         when directions.DOWN
-          @y += 1 unless @y == 47
+          @y += 1 unless @y == 49
         when directions.LEFT
           @x -= 1 unless @x == 0
         when directions.RIGHT
-          @x += 1 unless @x == 47
+          @x += 1 unless @x == 48
 
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y
 
   checkCollisions: (cycles)->
     if @state == CYCLE_STATES.RACING or @state == CYCLE_STATES.INSERTING
+      if (@y == 0 or @x == 0 or @y == 49 or @x == 48)
+        @triggerCollision()
+        return
       for cycle in cycles
         unless cycle is @
           if @checkCollisionWith(cycle)
