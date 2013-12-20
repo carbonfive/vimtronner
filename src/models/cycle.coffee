@@ -48,6 +48,7 @@ class Cycle
       []
 
   navigate: (movement) ->
+    return null if @state == CYCLE_STATES.INSERTING
     switch movement
       when 106
         @turnDown()
@@ -65,12 +66,14 @@ class Cycle
       else
         @state = CYCLE_STATES.DEAD
     else
-      @walls.push new Wall({
-        x: @x
-        y: @y
-        type: @nextWallType()
-        direction: @direction
-      })
+      if @state == CYCLE_STATES.INSERTING
+        @walls.push new Wall({
+          x: @x
+          y: @y
+          type: @nextWallType()
+          direction: @direction
+        })
+
       switch @direction
         when directions.UP
           @y -= 1 unless @y == 0
@@ -85,15 +88,16 @@ class Cycle
     @x == object.x and @y == object.y
 
   checkCollisions: (cycles)->
-    for cycle in cycles
-      unless cycle is @
-        if @checkCollisionWith(cycle)
-          @triggerCollision()
-          return
-      for wall in cycle.walls
-        if @checkCollisionWith(wall)
-          @triggerCollision()
-          return
+    if @state == CYCLE_STATES.RACING or @state == CYCLE_STATES.INSERTING
+      for cycle in cycles
+        unless cycle is @
+          if @checkCollisionWith(cycle)
+            @triggerCollision()
+            return
+        for wall in cycle.walls
+          if @checkCollisionWith(wall)
+            @triggerCollision()
+            return
 
   triggerCollision: ->
     @state = CYCLE_STATES.EXPLODING
@@ -110,6 +114,12 @@ class Cycle
 
   makeWinner: ->
     @state = Cycle.STATES.WINNER
+
+  enterInsert: ->
+    @state = Cycle.STATES.INSERTING if @state == Cycle.STATES.RACING
+
+  leaveInsert: ->
+    @state = Cycle.STATES.RACING if @state == Cycle.STATES.INSERTING
 
   toJSON: -> {
     number: @number

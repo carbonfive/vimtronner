@@ -48,6 +48,7 @@ class ClientSocket
     @socket.on 'join', @onJoin
     @socket.on 'leave', @onLeave
     @socket.on 'list', @onList
+    @socket.on 'toggleInsert', @onToggleInsert
 
   onJoin: (name)=>
     @game = @server.getGame(name)
@@ -72,5 +73,12 @@ class ClientSocket
 
   onList: =>
     @socket.emit 'games', @server.gameList()
+
+  onToggleInsert: (key) =>
+    return unless @game?
+    if key == 27
+      @cycle.leaveInsert()
+    else if key == 105
+      @cycle.enterInsert()
 
 module.exports = Server

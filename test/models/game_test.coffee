@@ -210,6 +210,8 @@ describe Game, ->
         @expectedWinnerCycle = sinon.createStubInstance(Cycle)
         @expectedWinnerCycle.state = Cycle.STATES.RACING
         @expectedLoserCycles = (sinon.createStubInstance(Cycle) for i in [1..3])
+        for cycle in @expectedLoserCycles
+          cycle.state = Cycle.STATES.DEAD
         @game.cycles = [
           @expectedLoserCycles[0]
           @expectedLoserCycles[1]
