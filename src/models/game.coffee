@@ -19,13 +19,17 @@ class Game extends EventEmitter
     @cycles = []
     @state = Game.STATES.WAITING
     @count = 3
+    Object.defineProperty @, 'inProgress', get: @_inProgress
 
   addCycle: ->
+    return null if @inProgress
+
     attributes = playerAttributes[@cycles.length]
     attributes['x'] = @playerPositions[@cycles.length]['x']
     attributes['y'] = @playerPositions[@cycles.length]['y']
     attributes['game'] = @
     cycle = new Cycle(attributes)
+
     @cycles.push cycle
     if @activeCycleCount() == @numberOfPlayers
       @start()
@@ -76,7 +80,7 @@ class Game extends EventEmitter
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
-  inProgress: ->
+  _inProgress: =>
     @state != Game.STATES.WAITING
 
   calculatePlayerPositions: ->

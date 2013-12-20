@@ -29,6 +29,8 @@ class Client
     process.stdin.on 'data', @onData
     @socket.on 'game', @onGameUpdate
     @socket.on 'error', @showErrorMessage
+    @socket.on 'cycle', @storeCycle
+    @socket.emit 'join', @game
     @socket.emit 'join', @gameAttributes
 
   onData: (chunk)=>
@@ -63,5 +65,7 @@ class Client
   showErrorMessage: (message) =>
     console.log message
     @quit()
+
+  storeCycle: (cycle)=> @cycle = cycle
 
 module.exports = Client

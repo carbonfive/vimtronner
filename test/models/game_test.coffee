@@ -44,19 +44,24 @@ describe Game, ->
 
 
   describe '#addCycle', ->
-    context 'when called for the first time', ->
+    context 'when the game is not waiting for players', ->
       beforeEach ->
+        @game.state = Game.STATES.STARTED
+        @addedCycle = @game.addCycle()
+
+      it 'returns nothing', ->
+        expect(@addedCycle).to.not.be.ok
+
+    context 'when the game is waiting', ->
+      beforeEach ->
+        @game.state = Game.STATES.WAITING
         @emit = sinon.stub(@game, 'emit')
-        @game.numberOfPlayers = 3
         @start = sinon.stub(@game, 'start')
         @addedCycle = @game.addCycle()
 
       it 'returns a new cycle', ->
         expect(@addedCycle).to.be.ok
         expect(@addedCycle).to.be.instanceOf(Cycle)
-
-      it 'assigns itself to the cycle', ->
-        expect(@addedCycle.game).to.eq(@game)
 
       it 'adds the cycle to list of cycles', ->
         expect(@game.cycles).to.include(@addedCycle)
@@ -65,15 +70,12 @@ describe Game, ->
         expect(@emit).to.have.been.calledWith('game', @game)
 
       context 'and when the set number of players is not reached', ->
-        beforeEach ->
-          @game.addCycle()
 
         it 'does not start the game', ->
           expect(@start).to.not.have.been.called
 
       context 'and when the set number of players is reached', ->
         beforeEach ->
-          @game.addCycle()
           @game.addCycle()
 
         it 'starts the game', ->
@@ -288,9 +290,9 @@ describe Game, ->
         ]
         for state in nonWaitingStates
           @game.state = state
-          expect(@game.inProgress()).to.be.true
+          expect(@game.inProgress).to.be.true
 
     context 'when the game is in the waiting state', ->
       it 'returns false', ->
         @game.state = Game.STATES.WAITING
-        expect(@game.inProgress()).to.be.false
+        expect(@game.inProgress).to.be.false
