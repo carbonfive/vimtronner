@@ -277,3 +277,20 @@ describe Game, ->
 
       it 'returns the JSON for each cycle in the game', ->
         expect(@json['cycles']).to.have.members (cycle.toJSON() for cycle in @game.cycles)
+
+  describe '#inProgress', ->
+    context 'when the game is not in the waiting state', ->
+      it 'returns true', ->
+        nonWaitingStates = [
+          Game.STATES.COUNTDOWN,
+          Game.STATES.STATES,
+          Game.STATES.FINISHED
+        ]
+        for state in nonWaitingStates
+          @game.state = state
+          expect(@game.inProgress()).to.be.true
+
+    context 'when the game is in the waiting state', ->
+      it 'returns false', ->
+        @game.state = Game.STATES.WAITING
+        expect(@game.inProgress()).to.be.false
