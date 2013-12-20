@@ -6,6 +6,7 @@ CYCLE_STATES = {
   EXPLODING: 1
   DEAD: 2
   WINNER: 3
+  INSERTING: 4
 }
 
 DIRECTIONS_TO_WALL_TYPES = {}
@@ -48,14 +49,24 @@ class Cycle
 
   navigate: (movement) ->
     switch movement
+      when 27
+        @state = CYCLE_STATES.RACING if @active()
+      when 105
+        @state = CYCLE_STATES.INSERTING if @active()
       when 106
-        @turnDown()
+        @turnDown() unless @inserting()
       when 107
-        @turnUp()
+        @turnUp() unless @inserting()
       when 104
-        @turnLeft()
+        @turnLeft() unless @inserting()
       when 108
-        @turnRight()
+        @turnRight() unless @inserting()
+
+  inserting: ->
+    @state == CYCLE_STATES.INSERTING
+
+  active: ->
+    @state == CYCLE_STATES.INSERTING or @state == CYCLE_STATES.RACING
 
   step: ->
     if @state == CYCLE_STATES.EXPLODING
@@ -64,35 +75,41 @@ class Cycle
       else
         @state = CYCLE_STATES.DEAD
     else
-      @walls.push new Wall({
-        x: @x
-        y: @y
-        type: @nextWallType()
-        direction: @direction
-      })
+      if @state == CYCLE_STATES.INSERTING
+        @walls.push new Wall({
+          x: @x
+          y: @y
+          type: @nextWallType()
+          direction: @direction
+        })
+
       switch @direction
         when directions.UP
           @y -= 1 unless @y == 0
         when directions.DOWN
-          @y += 1 unless @y == 47
+          @y += 1 unless @y == 49
         when directions.LEFT
           @x -= 1 unless @x == 0
         when directions.RIGHT
-          @x += 1 unless @x == 47
+          @x += 1 unless @x == 48
 
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y
 
   checkCollisions: (cycles)->
-    for cycle in cycles
-      unless cycle is @
-        if @checkCollisionWith(cycle)
-          @triggerCollision()
-          return
-      for wall in cycle.walls
-        if @checkCollisionWith(wall)
-          @triggerCollision()
-          return
+    if @state == CYCLE_STATES.RACING or @state == CYCLE_STATES.INSERTING
+      if (@y == 0 or @x == 0 or @y == 49 or @x == 48)
+        @triggerCollision()
+        return
+      for cycle in cycles
+        unless cycle is @
+          if @checkCollisionWith(cycle)
+            @triggerCollision()
+            return
+        for wall in cycle.walls
+          if @checkCollisionWith(wall)
+            @triggerCollision()
+            return
 
   triggerCollision: ->
     @state = CYCLE_STATES.EXPLODING

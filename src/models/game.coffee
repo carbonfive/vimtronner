@@ -84,7 +84,7 @@ class Game extends EventEmitter
     @emit 'stopped', @
 
   determineWinner: ->
-    cycle.makeWinner() for cycle in @cycles when cycle.state == Cycle.STATES.RACING
+    cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
   inProgress: ->
     @state != Game.STATES.WAITING

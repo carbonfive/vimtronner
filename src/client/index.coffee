@@ -33,7 +33,7 @@ class Client
 
   onData: (chunk)=>
     switch chunk[0]
-      when 3
+      when 113
         @quit()
         screen.clear()
       else
