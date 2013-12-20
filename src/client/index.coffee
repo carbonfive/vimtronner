@@ -7,7 +7,7 @@ class Client
   constructor: (@address="127.0.0.1", @port=8000)->
     @gameView = gameView = new GameView
 
-  join: (@game)->
+  join: (@gameAttributes)->
     @clearScreen()
     @connect(@andJoinGame)
 
@@ -29,7 +29,7 @@ class Client
     process.stdin.on 'data', @onData
     @socket.on 'game', @onGameUpdate
     @socket.on 'error', @showErrorMessage
-    @socket.emit 'join', @game
+    @socket.emit 'join', @gameAttributes
 
   onData: (chunk)=>
     switch chunk[0]

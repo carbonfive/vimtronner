@@ -27,9 +27,19 @@ class Game extends EventEmitter
       color: 2
       walls: []
     }
+    {
+      number: 3
+      x: 1
+      y: 47
+      direction: directions.UP
+      color: 3
+      walls: []
+    }
   ]
 
-  constructor: (@name=nil)->
+  constructor: (attributes)->
+    @name = attributes.name
+    @numberOfPlayers = attributes.numberOfPlayers ? 2
     @cycles = []
     @state = Game.STATES.WAITING
     @count = 3
@@ -37,7 +47,7 @@ class Game extends EventEmitter
   addCycle: ->
     cycle = new Cycle(Game.PLAYER_ATTRIBUTES[@cycles.length])
     @cycles.push cycle
-    if @activeCycleCount() > 1
+    if @activeCycleCount() == @numberOfPlayers
       @start()
     else
       @emit 'game', @
