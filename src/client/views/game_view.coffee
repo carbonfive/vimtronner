@@ -1,3 +1,5 @@
+require '../../define_property.coffee'
+
 screen = require '../screen'
 buffer = require '../buffer'
 Game = require '../../models/game'
@@ -18,9 +20,7 @@ class GameView
     @cycleViews = []
     @countString = ''
 
-    Object.defineProperty @, 'state', get: @_state
-
-  _state: => @game?.state
+  @property 'state', => @game?.state
 
   setGame: (game)->
     @game = game
