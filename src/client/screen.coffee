@@ -13,3 +13,7 @@ exports.setForegroundColor = (color)->
 
 exports.moveTo = (x, y) ->
   process.stdout.write "\x1b[#{y};#{x}f"
+
+exports.startX = ->
+  width = process.stdout.columns
+  (width/2) - 25

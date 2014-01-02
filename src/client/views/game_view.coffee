@@ -17,6 +17,7 @@ class GameView
   constructor: ->
     @cycleViews = []
     @countString = ''
+    @startX = screen.startX()
 
     Object.defineProperty @, 'state', get: @_state
 
@@ -44,31 +45,33 @@ class GameView
 
   renderArena: ->
     screen.setForegroundColor 3
-    screen.moveTo(1,1)
+    endX = @startX + 49
+    screen.moveTo(@startX,1)
     process.stdout.write ARENA_WALL_CHARS.TOP_LEFT_CORNER
-    for x in [2..49]
-      screen.moveTo x, 1
+    for x in [1..48]
+      screen.moveTo (@startX + x), 1
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo 50, 1
+    screen.moveTo endX, 1
     process.stdout.write ARENA_WALL_CHARS.TOP_RIGHT_CORNER
     for y in [2..49]
-      screen.moveTo 50, y
+      screen.moveTo endX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
-    screen.moveTo 50, 50
+    screen.moveTo endX, 50
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_RIGHT_CORNER
-    for x in [49..2]
-      screen.moveTo x, 50
+    for x in [48..1]
+      screen.moveTo (@startX + x), 50
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo 1, 50
+    screen.moveTo @startX, 50
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_LEFT_CORNER
     for y in [49..2]
-      screen.moveTo 1, y
+      screen.moveTo @startX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
 
   renderWaitScreen: ->
     @renderArena()
     screen.setForegroundColor 3
-    screen.moveTo(12,25)
+    messageX = @startX + 12
+    screen.moveTo(messageX, 25)
     process.stdout.write 'Waiting for other players...'
 
   renderCountdown: ->
@@ -78,7 +81,8 @@ class GameView
 
   renderCount: ->
     screen.setForegroundColor 3
-    screen.moveTo(20,25)
+    countX = @startX + 20
+    screen.moveTo(countX,25)
     process.stdout.write @countString
 
   renderCycleViews: ->

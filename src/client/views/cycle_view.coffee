@@ -22,6 +22,7 @@ class CycleView
   constructor: (cycle, game)->
     @cycle = cycle
     @game = game
+    @startX = screen.startX()
     @generateWallViews()
 
     Object.defineProperty @, 'nameX', get: @_nameX
@@ -39,7 +40,8 @@ class CycleView
   render: ->
     screen.setForegroundColor @cycle.color
 
-    screen.moveTo(@cycle.x + 1, @cycle.y + 1)
+    nextX = (@cycle.x + @startX) + 1
+    screen.moveTo(nextX, @cycle.y + 1)
     process.stdout.write @character()
 
     @renderWallViews()
@@ -60,11 +62,14 @@ class CycleView
     screen.moveTo(@nameX, @nameY)
     process.stdout.write "Player #{@cycle.number}"
 
-  _nameX: => if @cycle.x > 25 then @cycle.x - 10 else @cycle.x + 5
+  _nameX: =>
+    screenX = @startX + @cycle.x
+    if @cycle.x > 25 then screenX - 10 else screenX + 5
+
   _nameY: => @cycle.y + 1
 
   renderWinnerMessage: ->
-    messageX = @cycle.x - 1
+    messageX = @startX + @cycle.x - 1
     messageY = @cycle.y
     screen.moveTo(messageX, messageY)
     process.stdout.write "Winner!!!"
