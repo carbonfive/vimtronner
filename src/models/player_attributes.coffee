@@ -6,7 +6,7 @@ module.exports = [
       x: 1
       y: 1
       direction: directions.RIGHT
-      color: 4
+      color: 7
       walls: []
     }
     {
@@ -54,7 +54,7 @@ module.exports = [
       x: 1
       y: 25
       direction: directions.RIGHT
-      color: 8
+      color: 4
       walls: []
     }
     {
