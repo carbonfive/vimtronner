@@ -9,20 +9,42 @@ describe Server, ->
 
   describe '#getGame', ->
     context 'given a name', ->
-      beforeEach ->
-        @runningGame = new Game('My game name')
-        @server.games[@runningGame.name] = @runningGame
-
-      context 'given the game with that name is in progress', ->
+      context 'given the name belongs to a game that exists', ->
         beforeEach ->
-          sinon.stub(@runningGame, 'inProgress').returns(true)
+          @runningGame = new Game('My game name')
+          @server.games[@runningGame.name] = @runningGame
 
-        it 'returns null', ->
-          expect(@server.getGame(@runningGame.name)).to.be.null
+        context 'given the game with that name is in progress', ->
+          beforeEach ->
+            sinon.stub(@runningGame, 'inProgress').returns(true)
+            @attributes = { name: @runningGame.name }
 
-      context 'given the game with that name is waiting', ->
-        it 'returns the game', ->
-          expect(@server.getGame(@runningGame.name)).to.eq(@runningGame)
+          it 'returns null', ->
+            expect(@server.getGame(@attributes)).to.be.null
+
+        context 'given the game with that name is waiting', ->
+          it 'returns the game', ->
+            expect(@server.getGame(@attributes)).to.eq(@runningGame)
+
+      context 'given the name is for a new game', ->
+        beforeEach ->
+          @runningGame = new Game('My game name')
+          @server.games[@runningGame.name] = @runningGame
+          @attributes = { name: 'Another name' }
+
+        it 'creates a new game', ->
+          newGame = @server.getGame(@attributes)
+          expect(newGame).to.not.eq(@runningGame)
+          expect(newGame.name).to.eq(@attributes.name)
+
+        context 'given a number of players', ->
+          beforeEach ->
+            @attributes['numberOfPlayers'] = 3
+
+          it 'creates a game that allows that many players', ->
+            newGame = @server.getGame(@attributes)
+            expect(newGame.numberOfPlayers).to.eq(@attributes.numberOfPlayers)
+
 
   describe '#listen', ->
     beforeEach ->

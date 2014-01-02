@@ -1,5 +1,6 @@
 { EventEmitter } = require('events')
 directions = require './directions'
+playerAttributes = require './player_attributes'
 Cycle = require './cycle'
 
 class Game extends EventEmitter
@@ -10,34 +11,17 @@ class Game extends EventEmitter
     FINISHED: 3
   }
 
-  @PLAYER_ATTRIBUTES: [
-    {
-      number: 1
-      x: 1
-      y: 1
-      direction: directions.RIGHT
-      color: 4
-      walls: []
-    }
-    {
-      number: 2
-      x: 47
-      y: 47
-      direction: directions.LEFT
-      color: 2
-      walls: []
-    }
-  ]
-
-  constructor: (@name=nil)->
+  constructor: (attributes)->
+    @name = attributes.name
+    @numberOfPlayers = attributes.numberOfPlayers ? 2
     @cycles = []
     @state = Game.STATES.WAITING
     @count = 3
 
   addCycle: ->
-    cycle = new Cycle(Game.PLAYER_ATTRIBUTES[@cycles.length])
+    cycle = new Cycle(playerAttributes[@cycles.length])
     @cycles.push cycle
-    if @activeCycleCount() > 1
+    if @activeCycleCount() == @numberOfPlayers
       @start()
     else
       @emit 'game', @
@@ -93,6 +77,7 @@ class Game extends EventEmitter
     name: @name
     state: @state
     count: @count
+    numberOfPlayers: @numberOfPlayers
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 

@@ -6,8 +6,8 @@ class Server
   constructor: ()->
     @games = {}
 
-  getGame: (name) ->
-    game = @games[name] = (@games[name] ? new Game(name))
+  getGame: (attributes) ->
+    game = @games[attributes.name] = (@games[attributes.name] ? new Game(attributes))
     return null if game.inProgress()
     game.addListener 'game', @onGameChange
     game.addListener 'stopped', @onGameStopped
@@ -49,8 +49,8 @@ class ClientSocket
     @socket.on 'leave', @onLeave
     @socket.on 'list', @onList
 
-  onJoin: (name)=>
-    @game = @server.getGame(name)
+  onJoin: (properties)=>
+    @game = @server.getGame(properties)
     if @game?
       @socket.join @game.name
       @cycle = @game.addCycle()

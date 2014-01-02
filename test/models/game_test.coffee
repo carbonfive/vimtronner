@@ -2,7 +2,7 @@ Game = require '../../src/models/game'
 Cycle = require '../../src/models/cycle'
 
 describe Game, ->
-  beforeEach -> @game = new Game('name')
+  beforeEach -> @game = new Game(name: 'name')
 
   describe 'construction', ->
     context 'given a name', ->
@@ -18,10 +18,24 @@ describe Game, ->
       it 'provides an initial count of 3', ->
         expect(@game.count).to.eq(3)
 
+      it 'allows 2 players', ->
+        expect(@game.numberOfPlayers).to.eq(2)
+
+    context 'given a number of players', ->
+      beforeEach ->
+        @numberOfPlayers = 3
+        attributes = { name: 'new name', numberOfPlayers: @numberOfPlayers }
+        @game = new Game(attributes)
+
+      it 'allows that many players', ->
+        expect(@game.numberOfPlayers).to.eq(@numberOfPlayers)
+
   describe '#addCycle', ->
     context 'when called for the first time', ->
       beforeEach ->
         @emit = sinon.stub(@game, 'emit')
+        @game.numberOfPlayers = 3
+        @start = sinon.stub(@game, 'start')
         @addedCycle = @game.addCycle()
 
       it 'returns a new cycle', ->
@@ -34,9 +48,16 @@ describe Game, ->
       it 'emits a game event', ->
         expect(@emit).to.have.been.calledWith('game', @game)
 
-      context 'and when called again', ->
+      context 'and when the set number of players is not reached', ->
         beforeEach ->
-          @start = sinon.stub(@game, 'start')
+          @game.addCycle()
+
+        it 'does not start the game', ->
+          expect(@start).to.not.have.been.called
+
+      context 'and when the set number of players is reached', ->
+        beforeEach ->
+          @game.addCycle()
           @game.addCycle()
 
         it 'starts the game', ->
@@ -236,7 +257,7 @@ describe Game, ->
         @json = @game.toJSON()
 
       it 'returns the JSON with the game properties', ->
-        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count']
+        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count', 'numberOfPlayers']
 
       it 'returns the JSON for each cycle in the game', ->
         expect(@json['cycles']).to.have.members (cycle.toJSON() for cycle in @game.cycles)
