@@ -69,7 +69,7 @@ class GameView
     @renderArena()
     screen.setForegroundColor 3
     screen.moveTo(12,25)
-    process.stdout.write 'Player 1 waiting...'
+    process.stdout.write 'Waiting for other players...'
 
   renderCountdown: ->
     @renderArena()
