@@ -55,6 +55,9 @@ describe Game, ->
         expect(@addedCycle).to.be.ok
         expect(@addedCycle).to.be.instanceOf(Cycle)
 
+      it 'assigns itself to the cycle', ->
+        expect(@addedCycle.game).to.eq(@game)
+
       it 'adds the cycle to list of cycles', ->
         expect(@game.cycles).to.include(@addedCycle)
 

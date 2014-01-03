@@ -41,6 +41,7 @@ class Cycle
     @direction = attributes.direction
     @color = attributes.color
     @state = attributes.state ? CYCLE_STATES.RACING
+    @game = attributes.game
     @explosionFrame = 0
     @walls = if attributes.walls?
       (new Wall(wall) for wall in attributes.walls)
@@ -98,7 +99,9 @@ class Cycle
 
   checkCollisions: (cycles)->
     if @state == CYCLE_STATES.RACING or @state == CYCLE_STATES.INSERTING
-      if (@y == 0 or @x == 0 or @y == 49 or @x == 48)
+      bottomWallY = (@game.gridSize - 1)
+      rightWallX = (@game.gridSize - 2)
+      if (@y == 0 or @x == 0 or @y == bottomWallY or @x == rightWallX)
         @triggerCollision()
         return
       for cycle in cycles

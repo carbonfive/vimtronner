@@ -24,6 +24,7 @@ class Game extends EventEmitter
     attributes = playerAttributes[@cycles.length]
     attributes['x'] = @playerPositions[@cycles.length]['x']
     attributes['y'] = @playerPositions[@cycles.length]['y']
+    attributes['game'] = @
     cycle = new Cycle(attributes)
     @cycles.push cycle
     if @activeCycleCount() == @numberOfPlayers
