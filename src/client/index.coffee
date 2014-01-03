@@ -37,7 +37,7 @@ class Client
         @quit()
         screen.clear()
       else
-        @socket.emit 'movement', chunk[0]
+        @socket.emit 'keyPress', chunk[0]
 
   quit: ->
     process.kill process.pid, 'SIGINT'

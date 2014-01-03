@@ -10,6 +10,7 @@ class Server
     game = @games[attributes.name] = (@games[attributes.name] ? new Game(attributes))
     return null if game.inProgress()
     game.addListener 'game', @onGameChange
+    game.addListener 'restart', @onGameRestart
     game.addListener 'stopped', @onGameStopped
     game
 
@@ -18,6 +19,9 @@ class Server
 
   onGameChange: (game)=>
     @io.sockets.in(game.name).emit 'game', game.toJSON()
+
+  onGameRestart: (game)=>
+    game.restart()
 
   onGameStopped: (game)=>
     delete @games[game.name]
@@ -43,7 +47,7 @@ class Server
 
 class ClientSocket
   constructor: (@socket, @server)->
-    @socket.on 'movement', @onMovement
+    @socket.on 'keyPress', @onKeyPress
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'join', @onJoin
     @socket.on 'leave', @onLeave
@@ -55,7 +59,7 @@ class ClientSocket
       @socket.join @game.name
       @cycle = @game.addCycle()
     else
-      @socket.emit('error', "Game '#{name}' is already in progress.")
+      @socket.emit('error', "Game '#{@game.name}' is already in progress.")
 
   onLeave: =>
     if @game?
@@ -64,8 +68,17 @@ class ClientSocket
     @cycle = null
     @game = null
 
+  onKeyPress: (key)=>
+    if @game?
+      switch key
+        when 13
+          if @game.isRestarting()
+            @cycle = @game.addCycle()
+        else
+          @onMovement(key)
+
   onMovement: (movement)=>
-    @cycle.navigate(movement) if @game?
+    @cycle.navigate(movement)
 
   onDisconnect: =>
     @onLeave()

@@ -9,6 +9,7 @@ class Game extends EventEmitter
     COUNTDOWN: 1
     STARTED: 2
     FINISHED: 3
+    RESTARTING: 4
   }
 
   constructor: (attributes)->
@@ -37,6 +38,7 @@ class Game extends EventEmitter
     index = @cycles.indexOf cycle
     @cycles.splice index, 1
     @checkForWinner()
+    @emit('stopped', @) if @cycles.length == 0
 
   checkForWinner: ->
     if @activeCycleCount() <= 1
@@ -46,6 +48,11 @@ class Game extends EventEmitter
     count = 0
     count++ for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
     count
+
+  restart: ->
+    @cycles = []
+    @state = Game.STATES.RESTARTING
+    @count = 3
 
   start: ->
     @state = Game.STATES.COUNTDOWN
@@ -58,7 +65,7 @@ class Game extends EventEmitter
         cycle?.step()
         cycle?.checkCollisions(@cycles)
       @checkForWinner()
-    @emit 'game', @
+    @emit('game', @) unless @state == Game.STATES.RESTARTING
 
   countdown: =>
     @count--
@@ -71,13 +78,16 @@ class Game extends EventEmitter
     @state = Game.STATES.FINISHED
     @determineWinner()
     @emit 'game', @
-    @emit 'stopped', @
+    @emit 'restart', @
 
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
   inProgress: ->
     @state != Game.STATES.WAITING
+
+  isRestarting: ->
+    @state == Game.STATES.RESTARTING
 
   calculatePlayerPositions: ->
     minDistance = 3
