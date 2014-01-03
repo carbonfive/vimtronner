@@ -15,12 +15,16 @@ class Game extends EventEmitter
     @name = attributes.name
     @numberOfPlayers = attributes.numberOfPlayers ? 2
     @gridSize = attributes.gridSize ? 50
+    @playerPositions = @calculatePlayerPositions()
     @cycles = []
     @state = Game.STATES.WAITING
     @count = 3
 
   addCycle: ->
-    cycle = new Cycle(playerAttributes[@cycles.length])
+    attributes = playerAttributes[@cycles.length]
+    attributes['x'] = @playerPositions[@cycles.length]['x']
+    attributes['y'] = @playerPositions[@cycles.length]['y']
+    cycle = new Cycle(attributes)
     @cycles.push cycle
     if @activeCycleCount() == @numberOfPlayers
       @start()
@@ -73,6 +77,45 @@ class Game extends EventEmitter
 
   inProgress: ->
     @state != Game.STATES.WAITING
+
+  calculatePlayerPositions: ->
+    minDistance = 2
+    maxDistance = @gridSize - minDistance
+    halfDistance = Math.round(@gridSize / 2)
+    [
+      {
+        x: minDistance
+        y: minDistance
+      }
+      {
+        x: maxDistance
+        y: maxDistance
+      }
+      {
+        x: minDistance
+        y: maxDistance
+      }
+      {
+        x: maxDistance
+        y: minDistance
+      }
+      {
+        x: halfDistance
+        y: minDistance
+      }
+      {
+        x: halfDistance
+        y: maxDistance
+      }
+      {
+        x: minDistance
+        y: halfDistance
+      }
+      {
+        x: maxDistance
+        y: halfDistance
+      }
+    ]
 
   toJSON: -> {
     name: @name

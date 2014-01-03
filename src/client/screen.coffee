@@ -16,4 +16,4 @@ exports.moveTo = (x, y) ->
 
 exports.startX = ->
   width = process.stdout.columns
-  (width/2) - 25
+  Math.round((width/2) - 25)
