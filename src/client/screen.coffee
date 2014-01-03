@@ -14,6 +14,6 @@ exports.setForegroundColor = (color)->
 exports.moveTo = (x, y) ->
   process.stdout.write "\x1b[#{y};#{x}f"
 
-exports.startX = ->
+exports.center = ->
   width = process.stdout.columns
-  Math.round((width/2) - 25)
+  width/2

@@ -11,9 +11,9 @@ WALL_CHARACTERS[Wall.WALL_TYPES.NORTH_EAST] = buffer(0xE2, 0x94, 0x90)
 WALL_CHARACTERS[Wall.WALL_TYPES.SOUTH_EAST] = buffer(0xE2, 0x94, 0x98)
 
 class WallView
-  constructor: (wall)->
+  constructor: (wall, startX)->
     @wall = wall
-    @startX = screen.startX()
+    @startX = startX
 
   character: -> WALL_CHARACTERS[@wall.type]
 

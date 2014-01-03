@@ -17,7 +17,6 @@ class GameView
   constructor: ->
     @cycleViews = []
     @countString = ''
-    @startX = screen.startX()
 
     Object.defineProperty @, 'state', get: @_state
 
@@ -25,13 +24,14 @@ class GameView
 
   setGame: (game)->
     @game = game
+    @startX = Math.round(screen.center() - (@game.gridSize/2))
     if @game.count != @lastCount && @state == Game.STATES.COUNTDOWN
       @lastCount = @game.count
       @countString += "#{@game.count}..."
     @generateCycleViews()
 
   generateCycleViews: ->
-    @cycleViews = (new CycleView(cycle, @game) for cycle in @game.cycles)
+    @cycleViews = (new CycleView(cycle, @game, @startX) for cycle in @game.cycles)
 
   render: ->
     screen.clear()
@@ -45,25 +45,28 @@ class GameView
 
   renderArena: ->
     screen.setForegroundColor 3
-    endX = @startX + 49
+    xRange = @game.gridSize - 2
+    yRange = @game.gridSize - 1
+    endX = @startX + @game.gridSize
+    endY = @game.gridSize
     screen.moveTo(@startX,1)
     process.stdout.write ARENA_WALL_CHARS.TOP_LEFT_CORNER
-    for x in [1..48]
+    for x in [1..xRange]
       screen.moveTo (@startX + x), 1
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
     screen.moveTo endX, 1
     process.stdout.write ARENA_WALL_CHARS.TOP_RIGHT_CORNER
-    for y in [2..49]
+    for y in [2..yRange]
       screen.moveTo endX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
-    screen.moveTo endX, 50
+    screen.moveTo endX, endY
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_RIGHT_CORNER
-    for x in [48..1]
-      screen.moveTo (@startX + x), 50
+    for x in [xRange..1]
+      screen.moveTo (@startX + x), endY
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo @startX, 50
+    screen.moveTo @startX, endY
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_LEFT_CORNER
-    for y in [49..2]
+    for y in [yRange..2]
       screen.moveTo @startX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
 

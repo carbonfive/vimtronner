@@ -123,6 +123,7 @@ class Game extends EventEmitter
     count: @count
     numberOfPlayers: @numberOfPlayers
     gridSize: @gridSize
+    startX: @startX
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 

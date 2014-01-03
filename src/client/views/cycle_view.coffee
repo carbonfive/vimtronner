@@ -19,10 +19,10 @@ CYCLE_EXPLOSION[2] = buffer(0xE2, 0x97, 0xAF)
 CYCLE_EXPLODED = buffer(0xF0, 0x9F, 0x92, 0x80)
 
 class CycleView
-  constructor: (cycle, game)->
+  constructor: (cycle, game, startX)->
     @cycle = cycle
     @game = game
-    @startX = screen.startX()
+    @startX = startX
     @generateWallViews()
 
     Object.defineProperty @, 'nameX', get: @_nameX
@@ -53,7 +53,7 @@ class CycleView
       @renderWinnerMessage()
 
   generateWallViews: ->
-    @wallViews = (new WallView(wall) for wall in @cycle.walls)
+    @wallViews = (new WallView(wall, @startX) for wall in @cycle.walls)
 
   renderWallViews: ->
     wallView.render() for wallView in @wallViews
