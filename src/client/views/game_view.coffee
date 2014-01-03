@@ -39,9 +39,20 @@ class GameView
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
       @renderCountdown()
+    else if @state == Game.STATES.FINISHED
+      @countString = ""
+      @renderChoices()
     else
       @renderArena()
       @renderCycleViews()
+
+  renderChoices: ->
+    @renderArena()
+    @renderCycleViews()
+    screen.setForegroundColor 3
+    countX = @startX + 20
+    screen.moveTo(countX,25)
+    process.stdout.write 'Press ENTER to play again.'
 
   renderArena: ->
     screen.setForegroundColor 3

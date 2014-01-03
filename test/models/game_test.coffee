@@ -82,6 +82,8 @@ describe Game, ->
   describe '#removeCycle', ->
     context 'given a cycle', ->
       beforeEach ->
+        @emit = sinon.stub(@game, 'emit')
+
         @winnerCheck = sinon.stub(@game, 'checkForWinner')
         @firstCycle = sinon.createStubInstance(Cycle)
         @secondCycle = sinon.createStubInstance(Cycle)
@@ -96,6 +98,19 @@ describe Game, ->
 
       it 'checks for the winner', ->
         expect(@winnerCheck).to.have.been.called
+
+      it 'does not emit a stopped event', ->
+        expect(@emit).to.not.have.been.calledWith('stopped', @game)
+
+    context 'given no cycles', ->
+      beforeEach ->
+        @emit = sinon.stub(@game, 'emit')
+        @firstCycle = sinon.createStubInstance(Cycle)
+        @game.cycles = [ @firstCycle ]
+        @removedCycle = @game.removeCycle(@firstCycle)
+
+      it 'emits a stopped event', ->
+        expect(@emit).to.have.been.calledWith('stopped', @game)
 
   describe '#checkForWinner', ->
     beforeEach ->
@@ -238,8 +253,25 @@ describe Game, ->
       it 'emits a game event', ->
         expect(@emit).to.have.been.calledWith('game', @game)
 
-      it 'emits a stopped event', ->
-        expect(@emit).to.have.been.calledWith('stopped', @game)
+      it 'emits a game event', ->
+        expect(@emit).to.have.been.calledWith('restart', @game)
+
+  describe '#restart', ->
+    context 'given a finished game', ->
+      beforeEach ->
+        @game = new Game({state: Game.STATES.FINISHED})
+        cycle = new Cycle({game: @game})
+        @game.cycles = [cycle]
+        @game.restart()
+
+      it 'clears the Cycles array', ->
+        expect(@game.cycles).to.be.empty
+
+      it 'sets the State to restarting', ->
+        expect(@game.state).to.eq(Game.STATES.RESTARTING)
+
+      it 'sets the count to 3', ->
+        expect(@game.count).to.eq(3)
 
   describe '#determineWinner', ->
     context 'given a single cycle is racing', ->
