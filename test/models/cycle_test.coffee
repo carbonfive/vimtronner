@@ -98,7 +98,9 @@ describe Cycle, ->
 
   describe '#step', ->
     beforeEach ->
-      @cycle = new Cycle({direction: directions.RIGHT})
+      gridSize = Math.floor(Math.random() * 100) + 20
+      @game = new Game({name: 'game', gridSize: gridSize})
+      @cycle = new Cycle({direction: directions.RIGHT, game: @game})
 
     context 'given the cycle is exploding', ->
       beforeEach ->
@@ -132,6 +134,26 @@ describe Cycle, ->
       it 'does not create a new wall', ->
         @cycle.step()
         expect(@cycle.walls).to.be.empty
+
+    context 'given the cycle has hit the right wall', ->
+      beforeEach ->
+        @oldX = (@game.gridSize - 2)
+        @cycle.x = @oldX
+
+      it 'does not increment the x', ->
+        @cycle.step()
+        expect(@cycle.x).to.eq(@oldX)
+
+    context 'given the cycle has hit the bottom wall', ->
+      beforeEach ->
+        @oldY = (@game.gridSize - 1)
+        @cycle.direction = directions.DOWN
+        @cycle.y = @oldY
+
+      it 'does not increment the y', ->
+        @cycle.step()
+        expect(@cycle.y).to.eq(@oldY)
+
 
   describe '#checkCollisions', ->
     beforeEach ->
