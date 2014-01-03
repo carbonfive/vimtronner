@@ -15,6 +15,7 @@ program
   .option('-P, --port <port>', 'the port to launch the server or connect the client', 8000)
   .option('-G, --game <game>', 'the game the client wants to join')
   .option('-N, --number <number of players>', 'the number of players required to play (applies to new game only)')
+  .option('-Z, --size <size of grid>', 'the size of the game grid (applies to new game only)')
   .parse(process.argv)
 
 if program.server
@@ -25,6 +26,7 @@ if program.client
   client = new Client(program.address, program.port)
   if program.game?
     number = parseInt(program.number, 10)
-    client.join({name: program.game, numberOfPlayers: number})
+    size = parseInt(program.size, 10)
+    client.join({name: program.game, numberOfPlayers: number, gridSize: size})
   else
     client.listGames()
