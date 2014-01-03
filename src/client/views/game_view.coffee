@@ -24,13 +24,14 @@ class GameView
 
   setGame: (game)->
     @game = game
+    @startX = Math.round(screen.center() - (@game.gridSize/2))
     if @game.count != @lastCount && @state == Game.STATES.COUNTDOWN
       @lastCount = @game.count
       @countString += "#{@game.count}..."
     @generateCycleViews()
 
   generateCycleViews: ->
-    @cycleViews = (new CycleView(cycle, @game) for cycle in @game.cycles)
+    @cycleViews = (new CycleView(cycle, @game, @startX) for cycle in @game.cycles)
 
   render: ->
     screen.clear()
@@ -44,31 +45,36 @@ class GameView
 
   renderArena: ->
     screen.setForegroundColor 3
-    screen.moveTo(1,1)
+    xRange = @game.gridSize - 2
+    yRange = @game.gridSize - 1
+    endX = @startX + @game.gridSize
+    endY = @game.gridSize
+    screen.moveTo(@startX,1)
     process.stdout.write ARENA_WALL_CHARS.TOP_LEFT_CORNER
-    for x in [2..49]
-      screen.moveTo x, 1
+    for x in [1..xRange]
+      screen.moveTo (@startX + x), 1
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo 50, 1
+    screen.moveTo endX, 1
     process.stdout.write ARENA_WALL_CHARS.TOP_RIGHT_CORNER
-    for y in [2..49]
-      screen.moveTo 50, y
+    for y in [2..yRange]
+      screen.moveTo endX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
-    screen.moveTo 50, 50
+    screen.moveTo endX, endY
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_RIGHT_CORNER
-    for x in [49..2]
-      screen.moveTo x, 50
+    for x in [xRange..1]
+      screen.moveTo (@startX + x), endY
       process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo 1, 50
+    screen.moveTo @startX, endY
     process.stdout.write ARENA_WALL_CHARS.BOTTOM_LEFT_CORNER
-    for y in [49..2]
-      screen.moveTo 1, y
+    for y in [yRange..2]
+      screen.moveTo @startX, y
       process.stdout.write ARENA_WALL_CHARS.VERTICAL
 
   renderWaitScreen: ->
     @renderArena()
     screen.setForegroundColor 3
-    screen.moveTo(12,25)
+    messageX = @startX + 12
+    screen.moveTo(messageX, 25)
     process.stdout.write 'Waiting for other players...'
 
   renderCountdown: ->
@@ -78,7 +84,8 @@ class GameView
 
   renderCount: ->
     screen.setForegroundColor 3
-    screen.moveTo(20,25)
+    countX = @startX + 20
+    screen.moveTo(countX,25)
     process.stdout.write @countString
 
   renderCycleViews: ->

@@ -1,11 +1,13 @@
 directions = require '../../src/models/directions'
 Cycle = require '../../src/models/cycle'
 Wall = require '../../src/models/wall'
+Game = require '../../src/models/game'
 
 describe Cycle, ->
   describe '#navigate', ->
     beforeEach ->
-      @cycle = new Cycle
+      game = new Game(name: 'game')
+      @cycle = new Cycle({game: game})
       @turnDown = sinon.stub @cycle, 'turnDown'
       @turnUp = sinon.stub @cycle, 'turnUp'
       @turnLeft = sinon.stub @cycle, 'turnLeft'
@@ -96,7 +98,9 @@ describe Cycle, ->
 
   describe '#step', ->
     beforeEach ->
-      @cycle = new Cycle({direction: directions.RIGHT})
+      gridSize = Math.floor(Math.random() * 100) + 20
+      @game = new Game({name: 'game', gridSize: gridSize})
+      @cycle = new Cycle({direction: directions.RIGHT, game: @game})
 
     context 'given the cycle is exploding', ->
       beforeEach ->
@@ -130,3 +134,66 @@ describe Cycle, ->
       it 'does not create a new wall', ->
         @cycle.step()
         expect(@cycle.walls).to.be.empty
+
+    context 'given the cycle has hit the right wall', ->
+      beforeEach ->
+        @oldX = (@game.gridSize - 2)
+        @cycle.x = @oldX
+
+      it 'does not increment the x', ->
+        @cycle.step()
+        expect(@cycle.x).to.eq(@oldX)
+
+    context 'given the cycle has hit the bottom wall', ->
+      beforeEach ->
+        @oldY = (@game.gridSize - 1)
+        @cycle.direction = directions.DOWN
+        @cycle.y = @oldY
+
+      it 'does not increment the y', ->
+        @cycle.step()
+        expect(@cycle.y).to.eq(@oldY)
+
+
+  describe '#checkCollisions', ->
+    beforeEach ->
+      gridSize = Math.floor(Math.random() * 100) + 20
+      @game = new Game(name: 'game', gridSize: gridSize)
+      @cycle = new Cycle({
+        direction: directions.RIGHT,
+        state: Cycle.STATES.RACING,
+        game: @game
+      })
+      @triggerCollision = sinon.stub @cycle, 'triggerCollision'
+
+    context 'given the cycle has hit the right arena wall', ->
+      beforeEach ->
+        @cycle.x = (@game.gridSize - 2)
+        @cycle.checkCollisions([])
+
+      it 'triggers a collision', ->
+        expect(@triggerCollision).to.have.been.calledOnce
+
+    context 'given the cycle has hit the left arena wall', ->
+      beforeEach ->
+        @cycle.x = 0
+        @cycle.checkCollisions([])
+
+      it 'triggers a collision', ->
+        expect(@triggerCollision).to.have.been.calledOnce
+
+    context 'given the cycle has hit the top arena wall', ->
+      beforeEach ->
+        @cycle.y = 0
+        @cycle.checkCollisions([])
+
+      it 'triggers a collision', ->
+        expect(@triggerCollision).to.have.been.calledOnce
+
+    context 'given the cycle has hit the bottom arena wall', ->
+      beforeEach ->
+        @cycle.y = (@game.gridSize - 1)
+        @cycle.checkCollisions([])
+
+      it 'triggers a collision', ->
+        expect(@triggerCollision).to.have.been.calledOnce

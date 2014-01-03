@@ -21,6 +21,9 @@ describe Game, ->
       it 'allows 2 players', ->
         expect(@game.numberOfPlayers).to.eq(2)
 
+      it 'has a grid size of 50', ->
+        expect(@game.gridSize).to.eq(50)
+
     context 'given a number of players', ->
       beforeEach ->
         @numberOfPlayers = 3
@@ -29,6 +32,16 @@ describe Game, ->
 
       it 'allows that many players', ->
         expect(@game.numberOfPlayers).to.eq(@numberOfPlayers)
+
+    context 'given a grid size', ->
+      beforeEach ->
+        @gridSize = 75
+        attributes = { name: 'new name', gridSize: @gridSize }
+        @game = new Game(attributes)
+
+      it 'sets that grid size', ->
+        expect(@game.gridSize).to.eq(@gridSize)
+
 
   describe '#addCycle', ->
     context 'when called for the first time', ->
@@ -41,6 +54,9 @@ describe Game, ->
       it 'returns a new cycle', ->
         expect(@addedCycle).to.be.ok
         expect(@addedCycle).to.be.instanceOf(Cycle)
+
+      it 'assigns itself to the cycle', ->
+        expect(@addedCycle.game).to.eq(@game)
 
       it 'adds the cycle to list of cycles', ->
         expect(@game.cycles).to.include(@addedCycle)
@@ -257,7 +273,7 @@ describe Game, ->
         @json = @game.toJSON()
 
       it 'returns the JSON with the game properties', ->
-        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count', 'numberOfPlayers']
+        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count', 'numberOfPlayers', 'gridSize']
 
       it 'returns the JSON for each cycle in the game', ->
         expect(@json['cycles']).to.have.members (cycle.toJSON() for cycle in @game.cycles)

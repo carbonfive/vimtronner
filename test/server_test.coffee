@@ -45,6 +45,13 @@ describe Server, ->
             newGame = @server.getGame(@attributes)
             expect(newGame.numberOfPlayers).to.eq(@attributes.numberOfPlayers)
 
+        context 'given a grid size', ->
+          beforeEach ->
+            @attributes['gridSize'] = 75
+
+          it 'creates a game that allows that many players', ->
+            newGame = @server.getGame(@attributes)
+            expect(newGame.gridSize).to.eq(@attributes.gridSize)
 
   describe '#listen', ->
     beforeEach ->
