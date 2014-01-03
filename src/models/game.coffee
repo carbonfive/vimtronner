@@ -80,7 +80,7 @@ class Game extends EventEmitter
     @state != Game.STATES.WAITING
 
   calculatePlayerPositions: ->
-    minDistance = 2
+    minDistance = 3
     maxDistance = @gridSize - minDistance
     halfDistance = Math.round(@gridSize / 2)
     [
