@@ -48,9 +48,6 @@ class CycleView
 
     @renderWallViews()
 
-    if @game.state == Game.STATES.COUNTDOWN
-      @renderName()
-
     if @cycle.state == Cycle.STATES.WINNER
       @renderWinnerMessage()
 

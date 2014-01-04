@@ -19,19 +19,18 @@ describe Server, ->
           @server.games[@attributes.name] = @existingGame
 
         it 'returns the game', ->
-          expect(@server.getGame(@existingGame.name)).to.eq(@existingGame)
+          expect(@server.getGame(@attributes)).to.eq(@existingGame)
 
       context 'and a game with the same name does not already exists', ->
         beforeEach ->
           expect(@server.games).to.be.empty
-          @name = 'my game name'
 
         it 'creates a new game with the name', ->
           newGame = @server.getGame(@attributes)
           expect(newGame).to.be.ok
           expect(newGame.name).to.eq @name
           expect(@server.games).to.include.keys(@name)
-          expect(@server.games[@name]).to.eq @newGame
+          expect(@server.games[@name]).to.eq newGame
 
   describe '#listen', ->
     beforeEach ->

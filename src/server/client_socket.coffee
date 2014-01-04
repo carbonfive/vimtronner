@@ -1,21 +1,23 @@
 ClientGameSocket = require './client_game_socket'
 
 class ClientSocket
-  constructor: (@socket, @server)->
+  constructor: (@socket, @server, @gameSocketFactory)->
+    @gameSocketFactory ?= (socket, game, cycle)->
+      new ClientGameSocket(socket, game, cycle)
     @socket.on 'join', @onJoin
     @socket.on 'list', @onList
 
-  onJoin: (game)=>
-    @game = @server.getGame(game)
-    if @game?
-      if (@cycle = @game.addCycle())?
-        new ClientGameSocket(@socket, @game, @cycle)
+  onJoin: (gameAttributes, callback=(error, cycle)->)=>
+    game = @server.getGame(gameAttributes)
+    if game?
+      if (cycle = game.addCycle())?
+        @gameSocketFactory(@socket, game, cycle)
+        callback null, cycle.number, game.toJSON()
       else
-        @socket.emit 'error', "Game '#{game.name}' is already in progress."
+        callback message: "Game '#{gameAttributes.name}' is already in progress."
     else
-      @socket.emit 'error', "Could not find or create game named '#{game.name}'."
+      callback message: "Could not find or create game named '#{gameAttributes.name}'."
 
-  onList: =>
-    @socket.emit 'games', @server.gameList()
+  onList: => @socket.emit 'games', @server.gameList()
 
 module.exports = ClientSocket

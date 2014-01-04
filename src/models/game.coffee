@@ -81,7 +81,7 @@ class Game extends EventEmitter
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
-  @property 'inProgress', -> @state != Game.STATES.WAITING
+  @property 'inProgress', get: -> @state != Game.STATES.WAITING
 
   calculatePlayerPositions: ->
     minDistance = 3

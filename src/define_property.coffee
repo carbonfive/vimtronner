@@ -1,2 +1,2 @@
-Function::property = (property, getter)->
-  Object.defineProperty @prototype, property, get: getter
+Function::property = (property, description)->
+  Object.defineProperty @prototype, property, description
