@@ -16,6 +16,19 @@ ARENA_WALL_CHARS = {
   BOTTOM_RIGHT_CORNER: buffer(0xE2, 0x95, 0x9D)
 }
 
+CYCLE_NUMBER_NAMES = {
+  1: 'ONE'
+  2: 'TWO'
+  3: 'THREE'
+  4: 'FOUR'
+  5: 'FIVE'
+  6: 'SIX'
+  7: 'SEVEN'
+  8: 'EIGHT'
+}
+
+cycleNumberName = (cycleNumber)-> CYCLE_NUMBER_NAMES[cycleNumber]
+
 class GameView
 
   constructor: ->
@@ -52,7 +65,7 @@ class GameView
     else
       @renderArena()
       @renderCycleViews()
-    if @game? and @cycleNumber? then @renderGameInfo()
+    @renderGameInfo()
 
   renderArena: ->
     screen.setForegroundColor 3
@@ -83,6 +96,25 @@ class GameView
 
   renderWaitScreen: ->
     @renderArena()
+    instructions = [
+      'left............h'
+      'down............j'
+      'up..............k'
+      'right...........l'
+      'insert mode.....i'
+      'normal mode...esc'
+    ]
+    centerX = @startX + Math.round(@game.gridSize/2)
+    y = Math.round(@game.gridSize/2) - 4
+    screen.setForegroundColor 6
+    screen.print('vimTronner', centerX, y, screen.TEXT_ALIGN.CENTER)
+    y += 2
+    screen.resetColors()
+    screen.print(instructions[i], centerX, y + i, screen.TEXT_ALIGN.CENTER) for i in [0...instructions.length]
+    y += instructions.length + 1
+    screen.setForegroundColor playerColors(@cycleNumber)
+    screen.print("READY PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
+    screen.resetColors()
 
   renderCountdown: ->
     @renderArena()
