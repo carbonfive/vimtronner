@@ -31,9 +31,15 @@ exports.print = (string, x, y, alignment=LEFT) ->
   [sx, sy] = switch alignment
     when LEFT then [x, y]
     when RIGHT then [x - string.length + 1, y]
-    when CENTER then [x - string.length/2, y]
+    when CENTER then [x - Math.round(string.length/2), y]
   exports.moveTo sx, sy
   exports.render string
+
+exports.clearRect = (x,y,width,height)->
+  row = (' ' for i in [1..width]).join ''
+  for i in [0...height]
+    exports.moveTo x, y + i
+    exports.render row
 
 Object.defineProperty exports, 'columns', get: -> process.stdout.columns
 Object.defineProperty exports, 'rows', get: -> process.stdout.rows
