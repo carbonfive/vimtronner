@@ -8,50 +8,29 @@ describe Server, ->
   beforeEach -> @server = new Server
 
   describe '#getGame', ->
-    context 'given a name', ->
-      context 'given the name belongs to a game that exists', ->
+    context 'given the attributes of a game', ->
+      beforeEach ->
+        @name = 'My game name'
+        @attributes = { @name }
+
+      context 'and a game with the same name already exists', ->
         beforeEach ->
-          @runningGame = new Game('My game name')
-          @server.games[@runningGame.name] = @runningGame
+          @existingGame = new Game(@attributes)
+          @server.games[@attributes.name] = @existingGame
 
-        context 'given the game with that name is in progress', ->
-          beforeEach ->
-            sinon.stub(@runningGame, 'inProgress').returns(true)
-            @attributes = { name: @runningGame.name }
+        it 'returns the game', ->
+          expect(@server.getGame(@attributes)).to.eq(@existingGame)
 
-          it 'returns null', ->
-            expect(@server.getGame(@attributes)).to.be.null
-
-        context 'given the game with that name is waiting', ->
-          it 'returns the game', ->
-            expect(@server.getGame(@attributes)).to.eq(@runningGame)
-
-      context 'given the name is for a new game', ->
+      context 'and a game with the same name does not already exists', ->
         beforeEach ->
-          @runningGame = new Game('My game name')
-          @server.games[@runningGame.name] = @runningGame
-          @attributes = { name: 'Another name' }
+          expect(@server.games).to.be.empty
 
-        it 'creates a new game', ->
+        it 'creates a new game with the name', ->
           newGame = @server.getGame(@attributes)
-          expect(newGame).to.not.eq(@runningGame)
-          expect(newGame.name).to.eq(@attributes.name)
-
-        context 'given a number of players', ->
-          beforeEach ->
-            @attributes['numberOfPlayers'] = 3
-
-          it 'creates a game that allows that many players', ->
-            newGame = @server.getGame(@attributes)
-            expect(newGame.numberOfPlayers).to.eq(@attributes.numberOfPlayers)
-
-        context 'given a grid size', ->
-          beforeEach ->
-            @attributes['gridSize'] = 75
-
-          it 'creates a game that allows that many players', ->
-            newGame = @server.getGame(@attributes)
-            expect(newGame.gridSize).to.eq(@attributes.gridSize)
+          expect(newGame).to.be.ok
+          expect(newGame.name).to.eq @name
+          expect(@server.games).to.include.keys(@name)
+          expect(@server.games[@name]).to.eq newGame
 
   describe '#listen', ->
     beforeEach ->

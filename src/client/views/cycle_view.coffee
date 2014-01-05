@@ -1,3 +1,5 @@
+require '../../define_property'
+
 directions = require '../../models/directions'
 buffer = require '../buffer'
 screen = require '../screen'
@@ -46,9 +48,6 @@ class CycleView
 
     @renderWallViews()
 
-    if @game.state == Game.STATES.COUNTDOWN
-      @renderName()
-
     if @cycle.state == Cycle.STATES.WINNER
       @renderWinnerMessage()
 
@@ -62,11 +61,11 @@ class CycleView
     screen.moveTo(@nameX, @nameY)
     process.stdout.write "Player #{@cycle.number}"
 
-  _nameX: =>
+  @property 'nameX', =>
     screenX = @startX + @cycle.x
     if @cycle.x > 25 then screenX - 10 else screenX + 5
 
-  _nameY: => @cycle.y + 1
+  @property 'nameY', => @cycle.y + 1
 
   renderWinnerMessage: ->
     messageX = @startX + @cycle.x - 1

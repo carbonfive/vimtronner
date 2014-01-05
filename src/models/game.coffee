@@ -1,3 +1,5 @@
+require '../define_property'
+
 { EventEmitter } = require('events')
 directions = require './directions'
 playerAttributes = require './player_attributes'
@@ -21,11 +23,14 @@ class Game extends EventEmitter
     @count = 3
 
   addCycle: ->
+    return null if @inProgress
+
     attributes = playerAttributes[@cycles.length]
     attributes['x'] = @playerPositions[@cycles.length]['x']
     attributes['y'] = @playerPositions[@cycles.length]['y']
     attributes['game'] = @
     cycle = new Cycle(attributes)
+
     @cycles.push cycle
     if @activeCycleCount() == @numberOfPlayers
       @start()
@@ -76,8 +81,7 @@ class Game extends EventEmitter
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
-  inProgress: ->
-    @state != Game.STATES.WAITING
+  @property 'inProgress', get: -> @state != Game.STATES.WAITING
 
   calculatePlayerPositions: ->
     minDistance = 3

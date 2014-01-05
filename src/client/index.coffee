@@ -27,9 +27,11 @@ class Client
     process.stdin.setRawMode true
     process.stdin.resume()
     process.stdin.on 'data', @onData
-    @socket.on 'game', @onGameUpdate
-    @socket.on 'error', @showErrorMessage
-    @socket.emit 'join', @gameAttributes
+    @socket.emit 'join', @gameAttributes, (error, cycleNumber, game) =>
+      return @showErrorMessage(error.message) if error?
+      @cycleNumber = cycleNumber
+      @onGameUpdate(game)
+      @socket.on 'game', @onGameUpdate
 
   onData: (chunk)=>
     switch chunk[0]
@@ -47,7 +49,8 @@ class Client
     process.nextTick process.exit
 
   onGameUpdate: (game)=>
-    @gameView.setGame(game)
+    @gameView.game = game
+    @gameView.cycleNumber = @cycleNumber
     @gameView.render()
 
   andListGames: =>
@@ -63,5 +66,7 @@ class Client
   showErrorMessage: (message) =>
     console.log message
     @quit()
+
+  storeCycle: (cycle)=> @cycle = cycle
 
 module.exports = Client
