@@ -1,108 +1,29 @@
-directions = require './directions'
-Cycle = require './cycle'
-screen = require './screen'
-buffer = require './buffer'
+program = require 'commander'
+fs = require 'fs'
+Server = require './server'
+Client = require './client'
 
-ARENA_WALL_CHARS = {
-  HORIZONTAL: buffer(0xE2, 0x95, 0x90)
-  VERTICAL: buffer(0xE2, 0x95, 0x91)
-  TOP_LEFT_CORNER: buffer(0xE2, 0x95, 0x94)
-  TOP_RIGHT_CORNER: buffer(0xE2, 0x95, 0x97)
-  BOTTOM_LEFT_CORNER: buffer(0xE2, 0x95, 0x9A)
-  BOTTOM_RIGHT_CORNER: buffer(0xE2, 0x95, 0x9D)
-}
+exports = module.exports = (argv) ->
+  program
+    .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+    .option('-S, --server', 'launches a server')
+    .option('-C, --client', 'launches a client')
+    .option('-A, --address <address>', 'the address to connect the client', '127.0.0.1')
+    .option('-P, --port <port>', 'the port to launch the server or connect the client', 8000)
+    .option('-G, --game <game>', 'the game the client wants to join')
+    .option('-N, --number <number of players>', 'the number of players required to play (applies to new game only)')
+    .option('-Z, --size <size of grid>', 'the size of the game grid (applies to new game only)')
+    .parse(argv)
 
-cycles = []
-cycles.push new Cycle({
-  x: 1
-  y: 1
-  direction: directions.RIGHT
-  color: 4
-  walls: []
-})
-cycles.push new Cycle({
-  x: 47
-  y: 47
-  direction: directions.LEFT
-  color: 1
-  walls: []
-})
+  if program.server
+    server = new Server
+    server.listen(program.port)
 
-onSigInt = ->
-  screen.clear()
-  screen.showCursor()
-  process.nextTick process.exit
-
-process.on 'SIGINT', onSigInt
-
-process.stdin.setRawMode true
-process.stdin.resume()
-process.stdin.on 'data', (chunk)->
-  switch chunk[0]
-    when 3
-      process.kill process.pid, 'SIGINT'
-    when 106
-      cycles[0].turnDown()
-    when 107
-      cycles[0].turnUp()
-    when 104
-      cycles[0].turnLeft()
-    when 108
-      cycles[0].turnRight()
-    when 115
-      cycles[1].turnDown()
-    when 100
-      cycles[1].turnUp()
-    when 97
-      cycles[1].turnLeft()
-    when 102
-      cycles[1].turnRight()
-
-screen.clear()
-screen.hideCursor()
-
-renderArena = ->
-  screen.setForegroundColor 3
-  screen.moveTo(1,1)
-  process.stdout.write ARENA_WALL_CHARS.TOP_LEFT_CORNER
-  for x in [2..49]
-    screen.moveTo x, 1
-    process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-  screen.moveTo 50, 1
-  process.stdout.write ARENA_WALL_CHARS.TOP_RIGHT_CORNER
-  for y in [2..49]
-    screen.moveTo 50, y
-    process.stdout.write ARENA_WALL_CHARS.VERTICAL
-  screen.moveTo 50, 50
-  process.stdout.write ARENA_WALL_CHARS.BOTTOM_RIGHT_CORNER
-  for x in [49..2]
-    screen.moveTo x, 50
-    process.stdout.write ARENA_WALL_CHARS.HORIZONTAL
-  screen.moveTo 1, 50
-  process.stdout.write ARENA_WALL_CHARS.BOTTOM_LEFT_CORNER
-  for y in [49..2]
-    screen.moveTo 1, y
-    process.stdout.write ARENA_WALL_CHARS.VERTICAL
-
-render = ->
-  screen.clear()
-  renderArena()
-  for cycle in cycles
-    screen.setForegroundColor cycle.color
-    for wall in cycle.walls
-      screen.moveTo(wall.x + 1, wall.y + 1)
-      process.stdout.write wall.character()
-  for cycle in cycles
-    screen.setForegroundColor cycle.color
-    screen.moveTo(cycle.x + 1, cycle.y + 1)
-    process.stdout.write cycle.character()
-
-
-gameLoop = ->
-  for cycle in cycles
-    cycle.move()
-    cycle.checkCollisions(cycles)
-  render()
-
-render()
-setInterval gameLoop, 100
+  if program.client
+    client = new Client(program.address, program.port)
+    if program.game?
+      number = parseInt(program.number, 10)
+      size = parseInt(program.size, 10)
+      client.join({name: program.game, numberOfPlayers: number, gridSize: size})
+    else
+      client.listGames()

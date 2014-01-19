@@ -7,11 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/vimtronner_spec.js"
+    "test": "grunt mochaTest"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rudyjahchan/vimtronner.git"
+    "url": "git://github.com/carbonfive/vimtronner.git"
   },
   "keywords": [
     "vim",
@@ -23,19 +23,25 @@
   "gitHead": "9c7cc16afd1b5bace80fd886b9bbe9bc0dbaf9fc",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "coffee-script": "",
     "mocha": "",
     "chai": "",
     "sinon": "",
-    "sinon-chai": ""
+    "sinon-chai": "",
+    "grunt-cli": "~0.1.11",
+    "grunt": "~0.4.2",
+    "grunt-mocha": "~0.4.9",
+    "grunt-mocha-test": "~0.8.2",
+    "grunt-contrib-coffee": "~0.8.2",
+    "grunt-contrib-watch": "~0.5.3"
   },
   "dependencies": {
-    "coffee-script": "",
     "socket.io": "",
     "socket.io-client": "",
     "commander": ""
   },
   "bin": {
-    "vimtronner" : "./bin/vimtronner"
+    "vimtronner": "./bin/vimtronner"
   },
   "engines": {
     "node": "0.10.x",
