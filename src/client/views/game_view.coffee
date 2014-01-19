@@ -1,4 +1,4 @@
-require '../../define_property.coffee'
+require '../../define_property'
 
 screen = require '../screen'
 buffer = require '../buffer'

@@ -23,6 +23,7 @@
   "gitHead": "9c7cc16afd1b5bace80fd886b9bbe9bc0dbaf9fc",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "coffee-script": "",
     "mocha": "",
     "chai": "",
     "sinon": "",
@@ -34,7 +35,6 @@
     "grunt-contrib-coffee": "~0.8.2"
   },
   "dependencies": {
-    "coffee-script": "",
     "socket.io": "",
     "socket.io-client": "",
     "commander": ""
