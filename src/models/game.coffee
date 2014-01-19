@@ -20,7 +20,7 @@ class Game extends EventEmitter
     @playerPositions = @calculatePlayerPositions()
     @cycles = []
     @state = Game.STATES.WAITING
-    @count = 3
+    @_count = 3000
 
   addCycle: ->
     return null if @inProgress
@@ -54,21 +54,25 @@ class Game extends EventEmitter
 
   start: ->
     @state = Game.STATES.COUNTDOWN
-    @countInterval = setInterval @countdown, 1000
     @gameLoop = setInterval @loop, 100
 
   loop: =>
-    if @state == Game.STATES.STARTED
-      for cycle in @cycles
-        cycle?.step()
-        cycle?.checkCollisions(@cycles)
-      @checkForWinner()
+    switch @state
+      when Game.STATES.COUNTDOWN
+        @countdown()
+      when Game.STATES.STARTED
+        @runGame()
     @emit 'game', @
 
+  runGame: =>
+    for cycle in @cycles
+      cycle?.step()
+      cycle?.checkCollisions(@cycles)
+    @checkForWinner()
+
   countdown: =>
-    @count--
-    if @count == 0
-      clearInterval @countInterval
+    @_count -= 100
+    if @_count <= 0
       @state = Game.STATES.STARTED
 
   stop: ->
@@ -82,6 +86,9 @@ class Game extends EventEmitter
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
   @property 'inProgress', get: -> @state != Game.STATES.WAITING
+  @property 'count',
+    get: -> Math.ceil(@_count/1000.0)
+    set: (value)-> @_count = 1000.0 * value
 
   calculatePlayerPositions: ->
     minDistance = 3
@@ -125,7 +132,7 @@ class Game extends EventEmitter
   toJSON: -> {
     name: @name
     state: @state
-    count: @count
+    count: @count,
     numberOfPlayers: @numberOfPlayers
     gridSize: @gridSize
     startX: @startX
