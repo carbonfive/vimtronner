@@ -1,7 +1,7 @@
 Game = require '../../src/models/game'
 Cycle = require '../../src/models/cycle'
 
-describe Game, ->
+describe 'Game', ->
   beforeEach -> @game = new Game(name: 'name')
 
   describe 'construction', ->
@@ -132,7 +132,6 @@ describe Game, ->
   describe '#start', ->
     context 'when called', ->
       beforeEach ->
-        @countdown = sinon.stub(@game, 'countdown')
         @gameLoop = sinon.stub(@game, 'loop')
         @clock = sinon.useFakeTimers()
         @game.start()
@@ -142,10 +141,6 @@ describe Game, ->
 
       it 'changes the game state to countdown', ->
         expect(@game.state).to.eq(Game.STATES.COUNTDOWN)
-
-      it 'initiates a countdown to trigger every second', ->
-        @clock.tick(3001)
-        expect(@countdown).to.have.been.calledThrice
 
       it 'initiates a game loop to trigger every 100 milliseconds', ->
         @clock.tick(301)
@@ -185,30 +180,24 @@ describe Game, ->
     context 'given a count greater than 1', ->
       beforeEach ->
         expect(@game.count).to.eq(3)
-        @game.countdown()
 
-      it 'decreases the count by 1', ->
-        expect(@game.count).to.eq(2)
+      context 'and after called 10 times', ->
+        beforeEach ->
+          @game.countdown() for i in [1..10]
+
+        it 'decreases the count by 1', ->
+          expect(@game.count).to.eq(2)
 
     context 'given a count equal to 1', ->
       beforeEach ->
         @game.count = 1
-        @clock = sinon.useFakeTimers()
-        @fake = sinon.stub()
-        @game.countInterval = setInterval @fake, 100
-        @clock.tick(101)
-        expect(@fake).to.have.been.calledOnce
-        @game.countdown()
 
-      afterEach ->
-        @clock.restore()
+      context 'and after called 10 times', ->
+        beforeEach ->
+          @game.countdown() for i in [1..1000]
 
-      it 'changes the game state to started', ->
-        expect(@game.state).to.eq(Game.STATES.STARTED)
-
-      it 'calls clearInterval on the countdown', ->
-        @clock.tick(201)
-        expect(@fake).to.not.have.been.calledTwice
+        it 'changes the game state to started', ->
+          expect(@game.state).to.eq(Game.STATES.STARTED)
 
   describe '#stop', ->
     context 'when called', ->
