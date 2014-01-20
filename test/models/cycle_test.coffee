@@ -3,7 +3,7 @@ Cycle = require '../../src/models/cycle'
 Wall = require '../../src/models/wall'
 Game = require '../../src/models/game'
 
-describe Cycle, ->
+describe 'Cycle', ->
   describe '#navigate', ->
     beforeEach ->
       game = new Game(name: 'game')
@@ -137,7 +137,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the right wall', ->
       beforeEach ->
-        @oldX = (@game.gridSize - 2)
+        @oldX = (@game.gridSize - 1)
         @cycle.x = @oldX
 
       it 'does not increment the x', ->
@@ -168,7 +168,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the right arena wall', ->
       beforeEach ->
-        @cycle.x = (@game.gridSize - 2)
+        @cycle.x = (@game.gridSize - 1)
         @cycle.checkCollisions([])
 
       it 'triggers a collision', ->

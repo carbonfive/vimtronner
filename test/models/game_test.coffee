@@ -21,8 +21,8 @@ describe 'Game', ->
       it 'allows 2 players', ->
         expect(@game.numberOfPlayers).to.eq(2)
 
-      it 'has a grid size of 50', ->
-        expect(@game.gridSize).to.eq(50)
+      it 'has a grid size of 22', ->
+        expect(@game.gridSize).to.eq(22)
 
     context 'given a number of players', ->
       beforeEach ->

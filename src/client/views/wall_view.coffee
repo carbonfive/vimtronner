@@ -11,14 +11,13 @@ WALL_CHARACTERS[Wall.WALL_TYPES.NORTH_EAST] = buffer(0xE2, 0x94, 0x90)
 WALL_CHARACTERS[Wall.WALL_TYPES.SOUTH_EAST] = buffer(0xE2, 0x94, 0x98)
 
 class WallView
-  constructor: (wall, startX)->
+  constructor: (wall)->
     @wall = wall
-    @startX = startX
 
   character: -> WALL_CHARACTERS[@wall.type]
 
   render: ->
-    nextX = (@wall.x + @startX) + 1
+    nextX = (@wall.x) + 1
     screen.moveTo(nextX, @wall.y + 1)
     process.stdout.write @character()
 

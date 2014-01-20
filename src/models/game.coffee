@@ -16,7 +16,7 @@ class Game extends EventEmitter
   constructor: (attributes)->
     @name = attributes.name
     @numberOfPlayers = attributes.numberOfPlayers ? 2
-    @gridSize = attributes.gridSize ? 50
+    @gridSize = attributes.gridSize ? 22
     @playerPositions = @calculatePlayerPositions()
     @cycles = []
     @state = Game.STATES.WAITING
@@ -135,7 +135,6 @@ class Game extends EventEmitter
     count: @count,
     numberOfPlayers: @numberOfPlayers
     gridSize: @gridSize
-    startX: @startX
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 

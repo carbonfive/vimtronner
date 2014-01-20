@@ -11,11 +11,11 @@ describe 'screen', ->
 
   describe 'maxGridRows', ->
     it 'returns the maximum size a grid can be vertically', ->
-      expect(screen.maxGridRows).to.eq(process.stdout.rows - 4)
+      expect(screen.maxGridRows).to.eq(process.stdout.rows - 2)
 
   describe 'maxGridColumns', ->
     it 'returns the maximum size a grid can be horizontally', ->
-      expect(screen.maxGridColumns).to.eq(process.stdout.columns - 2)
+      expect(screen.maxGridColumns).to.eq(process.stdout.columns)
 
   describe 'maxGridSize', ->
     it 'returns the minimum of the maximum rows or columns', ->
