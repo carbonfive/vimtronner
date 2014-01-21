@@ -16,8 +16,8 @@ class Game extends EventEmitter
   constructor: (attributes)->
     @name = attributes.name
     @numberOfPlayers = attributes.numberOfPlayers ? 2
-    @gridSize = attributes.gridSize ? 22
-    @playerPositions = @calculatePlayerPositions()
+    @width = attributes.width ? 80
+    @height = attributes.height ? 22
     @cycles = []
     @state = Game.STATES.WAITING
     @_count = 3000
@@ -26,8 +26,6 @@ class Game extends EventEmitter
     return null if @inProgress
 
     attributes = playerAttributes[@cycles.length]
-    attributes['x'] = @playerPositions[@cycles.length]['x']
-    attributes['y'] = @playerPositions[@cycles.length]['y']
     attributes['game'] = @
     cycle = new Cycle(attributes)
 
@@ -54,6 +52,12 @@ class Game extends EventEmitter
 
   start: ->
     @state = Game.STATES.COUNTDOWN
+    @playerPositions = @calculatePlayerPositions()
+    for cycle, i in @cycles
+      do (cycle, i)->
+      cycle.x = @playerPositions[i]['x']
+      cycle.y = @playerPositions[i]['y']
+    @loop()
     @gameLoop = setInterval @loop, 100
 
   loop: =>
@@ -91,42 +95,21 @@ class Game extends EventEmitter
     set: (value)-> @_count = 1000.0 * value
 
   calculatePlayerPositions: ->
-    minDistance = 3
-    maxDistance = @gridSize - minDistance
-    halfDistance = Math.round(@gridSize / 2)
+    minXDistance = 3
+    maxXDistance = @width - minXDistance
+    halfXDistance = Math.round(@width / 2)
+    minYDistance = 3
+    maxYDistance = @height - minXDistance
+    halfYDistance = Math.round(@height / 2)
     [
-      {
-        x: minDistance
-        y: minDistance
-      }
-      {
-        x: maxDistance
-        y: maxDistance
-      }
-      {
-        x: minDistance
-        y: maxDistance
-      }
-      {
-        x: maxDistance
-        y: minDistance
-      }
-      {
-        x: halfDistance
-        y: minDistance
-      }
-      {
-        x: halfDistance
-        y: maxDistance
-      }
-      {
-        x: minDistance
-        y: halfDistance
-      }
-      {
-        x: maxDistance
-        y: halfDistance
-      }
+      { x: minXDistance, y: minYDistance }
+      { x: maxXDistance, y: maxYDistance }
+      { x: minXDistance, y: maxYDistance }
+      { x: maxXDistance, y: minYDistance }
+      { x: halfXDistance, y: minYDistance }
+      { x: halfXDistance, y: maxYDistance }
+      { x: minXDistance, y: halfYDistance }
+      { x: maxXDistance, y: halfYDistance }
     ]
 
   toJSON: -> {
@@ -134,7 +117,8 @@ class Game extends EventEmitter
     state: @state
     count: @count,
     numberOfPlayers: @numberOfPlayers
-    gridSize: @gridSize
+    width: @width
+    height: @height
     cycles: (cycle.toJSON() for cycle in @cycles)
   }
 

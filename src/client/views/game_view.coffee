@@ -52,9 +52,9 @@ class GameView
       when Game.STATES.STARTED then 'Go'
       when Game.STATES.FINISHED then 'Game over'
   @property 'startX', get: ->
-    Math.round(screen.center.x - (@_game.gridSize/2))
+    Math.round(screen.center.x - (@_game.width/2))
   @property 'startY', get: ->
-    Math.round(screen.center.y - 2 - (@_game.gridSize/2))
+    Math.round(screen.center.y - 2 - (@_game.height/2))
 
 
   generateCycleViews: ->
@@ -62,6 +62,7 @@ class GameView
 
   render: ->
     screen.clear()
+    screen.hideCursor()
     screen.save()
     screen.transform(@startX, @startY)
     if @state == Game.STATES.WAITING
@@ -76,10 +77,10 @@ class GameView
 
   renderArena: ->
     screen.setForegroundColor 3
-    xRange = @game.gridSize - 1
-    yRange = @game.gridSize - 1
-    endX = @game.gridSize
-    endY = @game.gridSize
+    xRange = @game.width - 1
+    yRange = @game.height - 1
+    endX = @game.width
+    endY = @game.height
     screen.moveTo(1,1)
     screen.render ARENA_WALL_CHARS.TOP_LEFT_CORNER
     for x in [2..xRange]
@@ -111,8 +112,8 @@ class GameView
       'insert mode.....i'
       'normal mode...esc'
     ]
-    centerX = Math.round(@game.gridSize/2)
-    y = Math.round(@game.gridSize/2) - 4
+    centerX = Math.round(@game.width/2)
+    y = Math.round(@game.height/2) - 4
     screen.setForegroundColor 6
     screen.print('vimTronner', centerX, y, screen.TEXT_ALIGN.CENTER)
     y += 2
@@ -130,8 +131,8 @@ class GameView
 
   renderCount: ->
     screen.setForegroundColor 3
-    countX = Math.round(@game.gridSize/2)
-    screen.print @countString, countX, Math.round(@game.gridSize/2), screen.TEXT_ALIGN.CENTER
+    countX = Math.round(@game.width/2)
+    screen.print @countString, countX, Math.round(@game.height/2), screen.TEXT_ALIGN.CENTER
 
   renderCycleViews: ->
     cycleView.render() for cycleView in @cycleViews

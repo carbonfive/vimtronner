@@ -1,9 +1,27 @@
 Client = require '../src/client'
 Cycle = require '../src/models/cycle'
+GameView = require '../src/client/views/game_view'
 
-describe Client, ->
+describe 'Client', ->
   beforeEach ->
     @client = new Client
+
+  describe '#join', ->
+    beforeEach ->
+      sinon.stub(@client, 'connect')
+      @gameAttributes = {}
+      @client.join @gameAttributes
+
+    it 'sets the width and height of the game', ->
+      expect(@client.gameAttributes).to.eq(@gameAttributes)
+      expect(@client.gameAttributes.height).to.eq(process.stdout.rows - 2)
+      expect(@client.gameAttributes.width).to.eq(process.stdout.columns)
+
+    it 'creates a game screen', ->
+      expect(@client.gameView).to.be.instanceOf GameView
+
+    it 'connects and waits to join a game', ->
+      expect(@client.connect).to.have.been.calledWith @client.andJoinGame
 
   describe '#storeCycle', ->
     context 'given a cycle', ->
@@ -17,15 +35,16 @@ describe Client, ->
   describe '#andJoinGame', ->
     beforeEach ->
       @emit = sinon.stub()
+      @client.gameAttributes = { foo: 'bar' }
       @on = sinon.stub()
-      @client.game = 'aGame'
       @client.socket = { @emit, @on }
 
     context 'when joining a game', ->
       beforeEach -> @client.andJoinGame()
 
-      it 'requests to join the game', ->
-        expect(@emit).to.have.been.calledWith 'join', @client.gameAttributes
+      it 'requests to join the game with the game and terminal attributes', ->
+        expect(@emit).to.have.been.calledWith 'join',
+          @client.gameAttributes
 
       context 'and when there is an error', ->
         beforeEach ->

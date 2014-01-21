@@ -4,7 +4,7 @@ Server = require '../src/server'
 http = require 'http'
 socketio = require('socket.io-client')
 
-describe Server, ->
+describe 'Server', ->
   beforeEach -> @server = new Server
 
   describe '#getGame', ->

@@ -48,6 +48,9 @@ module.exports.moveTo = (x, y) ->
 module.exports.resetColors = ->
   process.stdout.write '\x1b[39;49m'
 
+module.exports.resetAll = ->
+  process.stdout.write '\x1b[0m'
+
 module.exports.render = (buffer)->
   process.stdout.write buffer
 
