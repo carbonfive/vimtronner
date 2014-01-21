@@ -5,18 +5,27 @@ GameListView = require './views/game_list_view'
 
 class Client
   constructor: (@address="127.0.0.1", @port=8000)->
-    @gameView = gameView = new GameView
 
   join: (@gameAttributes)->
-    @clearScreen()
+    @gameAttributes.width = screen.columns
+    @gameAttributes.height = screen.rows - 2
+    @checkValidity()
+    @gameView = gameView = new GameView
     @connect(@andJoinGame)
+
+  checkValidity: ->
+    invalid = (
+      @gameAttributes.width < 22 or
+      @gameAttributes.height < 22 or
+      @gameAttributes.width > screen.columns or
+      @gameAttributes.height > screen.rows - 2
+    )
+    (throw new Error(
+      "Width and height but be no smaller than 22 and no bigger than screen size"
+    )) if invalid
 
   listGames: ->
     @connect(@andListGames)
-
-  clearScreen: ->
-    screen.clear()
-    screen.hideCursor()
 
   connect: (callback)->
     @socket = socketio.connect("http://#{@address}:#{@port}")

@@ -7,13 +7,18 @@ module.exports = function(grunt) {
     mochaTest: {
       test: {
         options: {
-          mocha: require('mocha')
+          mocha: require('mocha'),
+          require: 'test/common'
         },
-        src: ['test/**/*.coffee']
+        src: ['test/**/*_test.coffee']
       }
     },
     coffee: {
       compile: {
+        options: {
+          sourceMap: true,
+          sourceMapDir: 'maps/'
+        },
         expand: true,
         cwd: 'src/',
         src: ['**/*.coffee'],
@@ -24,14 +29,14 @@ module.exports = function(grunt) {
     watch: {
       tests: {
         files: ['test/**/*_test.coffee'],
-        tasks: ['mochaTest']
+        tasks: ['build']
       },
       src: {
         files: ['src/**/*.coffee'],
-        tasks: ['mochaTest', 'coffee']
+        tasks: ['build']
       }
     }
   });
-  grunt.registerTask('build', ['mochaTest','coffee']);
+  grunt.registerTask('build', ['coffee', 'mochaTest']);
   grunt.registerTask('default', ['mochaTest']);
 };

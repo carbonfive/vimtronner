@@ -1,50 +1,82 @@
-exports.clear = ->
+transformationStack = [{x: 0, y: 0}]
+
+Object.defineProperty module.exports, 'transformationStackTail', get: ->
+  [rest...,tail] = transformationStack
+  tail
+
+transform = (x,y)->
+  transformationStack.reduce(
+    ((point, transform)->
+      {
+        x: point.x + transform.x
+        y: point.y + transform.y
+      }
+    ),
+    { x, y }
+  )
+
+module.exports.save = ->
+  transformationStack.push { x: 0, y: 0}
+
+module.exports.restore = ->
+  transformationStack.pop() if transformationStack.length > 1
+
+module.exports.transform = (x,y)->
+  module.exports.transformationStackTail.x = x
+  module.exports.transformationStackTail.y = y
+
+module.exports.clear = ->
   process.stdout.write '\x1b[2J'
   process.stdout.write '\x1b[H'
 
-exports.hideCursor = ->
+module.exports.hideCursor = ->
   process.stdout.write '\x1b[?25l'
 
-exports.showCursor = ->
+module.exports.showCursor = ->
   process.stdout.write '\x1b[?25h'
 
-exports.setForegroundColor = (color)->
+module.exports.setForegroundColor = (color)->
   process.stdout.write "\x1b[3#{color}m"
 
-exports.setBackgroundColor = (color)->
+module.exports.setBackgroundColor = (color)->
   process.stdout.write "\x1b[4#{color}m"
 
-exports.moveTo = (x, y) ->
+module.exports.moveTo = (x, y) ->
+  { x, y } = transform(x,y)
   process.stdout.write "\x1b[#{y};#{x}f"
 
-exports.resetColors = ->
+module.exports.resetColors = ->
   process.stdout.write '\x1b[39;49m'
 
-exports.render = (buffer)->
+module.exports.resetAll = ->
+  process.stdout.write '\x1b[0m'
+
+module.exports.render = (buffer)->
   process.stdout.write buffer
 
 [ LEFT, RIGHT, CENTER ] = [0, 1, 2]
 
-exports.TEXT_ALIGN = { LEFT, RIGHT, CENTER }
+module.exports.TEXT_ALIGN = { LEFT, RIGHT, CENTER }
 
-exports.print = (string, x, y, alignment=LEFT) ->
+module.exports.print = (string, x, y, alignment=LEFT) ->
   [sx, sy] = switch alignment
     when LEFT then [x, y]
     when RIGHT then [x - string.length + 1, y]
     when CENTER then [x - Math.round(string.length/2), y]
-  exports.moveTo sx, sy
-  exports.render string
+  module.exports.moveTo sx, sy
+  module.exports.render string
 
-exports.clearRect = (x,y,width,height)->
+module.exports.clearRect = (x,y,width,height)->
   row = (' ' for i in [1..width]).join ''
   for i in [0...height]
-    exports.moveTo x, y + i
-    exports.render row
+    module.exports.moveTo x, y + i
+    module.exports.render row
 
-Object.defineProperty exports, 'columns', get: -> process.stdout.columns
-Object.defineProperty exports, 'rows', get: -> process.stdout.rows
-Object.defineProperty exports, 'center', get: -> Math.round(@columns/2)
-Object.defineProperty exports, 'maxGridRows', get: -> process.stdout.rows - 4
-Object.defineProperty exports, 'maxGridColumns', get: -> process.stdout.columns - 2
-Object.defineProperty exports, 'maxGridSize',
+Object.defineProperty module.exports, 'columns', get: -> process.stdout.columns
+Object.defineProperty module.exports, 'rows', get: -> process.stdout.rows
+Object.defineProperty module.exports, 'center', get: ->
+  { x: Math.round(@columns/2), y: Math.round(@rows/2) }
+Object.defineProperty module.exports, 'maxGridRows', get: -> process.stdout.rows - 2
+Object.defineProperty module.exports, 'maxGridColumns', get: -> process.stdout.columns
+Object.defineProperty module.exports, 'maxGridSize',
   get: -> Math.min @maxGridRows, @maxGridColumns

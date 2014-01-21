@@ -3,7 +3,7 @@ Cycle = require '../../src/models/cycle'
 Wall = require '../../src/models/wall'
 Game = require '../../src/models/game'
 
-describe Cycle, ->
+describe 'Cycle', ->
   describe '#navigate', ->
     beforeEach ->
       game = new Game(name: 'game')
@@ -98,8 +98,9 @@ describe Cycle, ->
 
   describe '#step', ->
     beforeEach ->
-      gridSize = Math.floor(Math.random() * 100) + 20
-      @game = new Game({name: 'game', gridSize: gridSize})
+      width = Math.floor(Math.random() * 100) + 80
+      height = Math.floor(Math.random() * 100) + 22
+      @game = new Game({name: 'game', width: width, height: height})
       @cycle = new Cycle({direction: directions.RIGHT, game: @game})
 
     context 'given the cycle is exploding', ->
@@ -137,7 +138,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the right wall', ->
       beforeEach ->
-        @oldX = (@game.gridSize - 2)
+        @oldX = (@game.width - 1)
         @cycle.x = @oldX
 
       it 'does not increment the x', ->
@@ -146,7 +147,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the bottom wall', ->
       beforeEach ->
-        @oldY = (@game.gridSize - 1)
+        @oldY = (@game.height - 1)
         @cycle.direction = directions.DOWN
         @cycle.y = @oldY
 
@@ -157,8 +158,9 @@ describe Cycle, ->
 
   describe '#checkCollisions', ->
     beforeEach ->
-      gridSize = Math.floor(Math.random() * 100) + 20
-      @game = new Game(name: 'game', gridSize: gridSize)
+      width = Math.floor(Math.random() * 100) + 80
+      height = Math.floor(Math.random() * 100) + 22
+      @game = new Game(name: 'game', width: width, height: height)
       @cycle = new Cycle({
         direction: directions.RIGHT,
         state: Cycle.STATES.RACING,
@@ -168,7 +170,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the right arena wall', ->
       beforeEach ->
-        @cycle.x = (@game.gridSize - 2)
+        @cycle.x = (@game.width - 1)
         @cycle.checkCollisions([])
 
       it 'triggers a collision', ->
@@ -192,7 +194,7 @@ describe Cycle, ->
 
     context 'given the cycle has hit the bottom arena wall', ->
       beforeEach ->
-        @cycle.y = (@game.gridSize - 1)
+        @cycle.y = (@game.height - 1)
         @cycle.checkCollisions([])
 
       it 'triggers a collision', ->

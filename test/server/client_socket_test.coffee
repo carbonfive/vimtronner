@@ -4,7 +4,7 @@ Server = require '../../src/server'
 Game = require '../../src/models/game'
 Cycle = require '../../src/models/cycle'
 
-describe ClientSocket, ->
+describe 'ClientSocket', ->
   beforeEach ->
     @socket = {
       on: sinon.stub(), join: sinon.stub(), emit: sinon.stub(), leave: sinon.stub()

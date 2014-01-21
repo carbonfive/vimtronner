@@ -21,8 +21,11 @@ describe 'Game', ->
       it 'allows 2 players', ->
         expect(@game.numberOfPlayers).to.eq(2)
 
-      it 'has a grid size of 50', ->
-        expect(@game.gridSize).to.eq(50)
+      it 'has a grid width of 80', ->
+        expect(@game.width).to.eq(80)
+
+      it 'has a grid height of 22', ->
+        expect(@game.height).to.eq(22)
 
     context 'given a number of players', ->
       beforeEach ->
@@ -33,15 +36,23 @@ describe 'Game', ->
       it 'allows that many players', ->
         expect(@game.numberOfPlayers).to.eq(@numberOfPlayers)
 
-    context 'given a grid size', ->
+    context 'given a grid width', ->
       beforeEach ->
-        @gridSize = 75
-        attributes = { name: 'new name', gridSize: @gridSize }
+        @width = 75
+        attributes = { name: 'new name', width: @width }
         @game = new Game(attributes)
 
-      it 'sets that grid size', ->
-        expect(@game.gridSize).to.eq(@gridSize)
+      it 'sets that grid width', ->
+        expect(@game.width).to.eq(@width)
 
+    context 'given a grid height', ->
+      beforeEach ->
+        @height = 75
+        attributes = { name: 'new name', height: @height }
+        @game = new Game(attributes)
+
+      it 'sets that grid height', ->
+        expect(@game.height).to.eq(@height)
 
   describe '#addCycle', ->
     context 'when the game is not waiting for players', ->
@@ -144,7 +155,7 @@ describe 'Game', ->
 
       it 'initiates a game loop to trigger every 100 milliseconds', ->
         @clock.tick(301)
-        expect(@gameLoop).to.have.been.calledThrice
+        expect(@gameLoop.callCount).to.eq(4)
 
   describe '#loop', ->
     beforeEach ->
@@ -264,7 +275,9 @@ describe 'Game', ->
         @json = @game.toJSON()
 
       it 'returns the JSON with the game properties', ->
-        expect(@json[property]).to.eq(@game[property]) for property in ['name', 'state', 'count', 'numberOfPlayers', 'gridSize']
+        expect(@json[property]).to.eq(@game[property]) for property in [
+          'name', 'state', 'count', 'numberOfPlayers', 'width', 'height'
+        ]
 
       it 'returns the JSON for each cycle in the game', ->
         expect(@json['cycles']).to.have.members (cycle.toJSON() for cycle in @game.cycles)

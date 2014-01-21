@@ -39,7 +39,6 @@ class GameView
   @property 'game', {
     set: (game)->
       @_game = game
-      @startX = Math.round(screen.center - (@_game.gridSize/2))
       if @_game.count != @lastCount and @state == Game.STATES.COUNTDOWN
         @lastCount = @_game.count
         @countString += "#{@_game.count}..."
@@ -52,12 +51,20 @@ class GameView
       when Game.STATES.COUNTDOWN then 'Get ready'
       when Game.STATES.STARTED then 'Go'
       when Game.STATES.FINISHED then 'Game over'
+  @property 'startX', get: ->
+    Math.round(screen.center.x - (@_game.width/2))
+  @property 'startY', get: ->
+    Math.round(screen.center.y - 2 - (@_game.height/2))
+
 
   generateCycleViews: ->
-    @cycleViews = (new CycleView(cycle, @_game, @startX) for cycle in @_game.cycles)
+    @cycleViews = (new CycleView(cycle, @_game) for cycle in @_game.cycles)
 
   render: ->
     screen.clear()
+    screen.hideCursor()
+    screen.save()
+    screen.transform(@startX, @startY)
     if @state == Game.STATES.WAITING
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
@@ -65,18 +72,19 @@ class GameView
     else
       @renderArena()
       @renderCycleViews()
+    screen.restore()
     @renderGameInfo()
 
   renderArena: ->
     screen.setForegroundColor 3
-    xRange = @game.gridSize - 1
-    yRange = @game.gridSize - 1
-    endX = @startX + @game.gridSize
-    endY = @game.gridSize
-    screen.moveTo(@startX,1)
+    xRange = @game.width - 1
+    yRange = @game.height - 1
+    endX = @game.width
+    endY = @game.height
+    screen.moveTo(1,1)
     screen.render ARENA_WALL_CHARS.TOP_LEFT_CORNER
-    for x in [1..xRange]
-      screen.moveTo (@startX + x), 1
+    for x in [2..xRange]
+      screen.moveTo (x), 1
       screen.render ARENA_WALL_CHARS.HORIZONTAL
     screen.moveTo endX, 1
     screen.render ARENA_WALL_CHARS.TOP_RIGHT_CORNER
@@ -86,12 +94,12 @@ class GameView
     screen.moveTo endX, endY
     screen.render ARENA_WALL_CHARS.BOTTOM_RIGHT_CORNER
     for x in [xRange..1]
-      screen.moveTo (@startX + x), endY
+      screen.moveTo x, endY
       screen.render ARENA_WALL_CHARS.HORIZONTAL
-    screen.moveTo @startX, endY
+    screen.moveTo 1, endY
     screen.render ARENA_WALL_CHARS.BOTTOM_LEFT_CORNER
     for y in [yRange..2]
-      screen.moveTo @startX, y
+      screen.moveTo 1, y
       screen.render ARENA_WALL_CHARS.VERTICAL
 
   renderWaitScreen: ->
@@ -104,8 +112,8 @@ class GameView
       'insert mode.....i'
       'normal mode...esc'
     ]
-    centerX = @startX + Math.round(@game.gridSize/2)
-    y = Math.round(@game.gridSize/2) - 4
+    centerX = Math.round(@game.width/2)
+    y = Math.round(@game.height/2) - 4
     screen.setForegroundColor 6
     screen.print('vimTronner', centerX, y, screen.TEXT_ALIGN.CENTER)
     y += 2
@@ -123,8 +131,8 @@ class GameView
 
   renderCount: ->
     screen.setForegroundColor 3
-    countX = @startX + Math.round(@game.gridSize/2)
-    screen.print @countString, countX, Math.round(@game.gridSize/2), screen.TEXT_ALIGN.CENTER
+    countX = Math.round(@game.width/2)
+    screen.print @countString, countX, Math.round(@game.height/2), screen.TEXT_ALIGN.CENTER
 
   renderCycleViews: ->
     cycleView.render() for cycleView in @cycleViews
@@ -134,7 +142,7 @@ class GameView
       screen.setBackgroundColor playerColors(@cycleNumber)
       screen.setForegroundColor 0
       screen.print((' ' for i in [1..screen.columns]).join(''), 1, screen.rows - 1)
-      screen.print("#{@game.name}  Player: #{@cycleNumber}  State: #{@stateString}", 1, screen.rows - 1)
+      screen.print("#{@game.name}  Player: #{@cycleNumber}  State: #{@stateString} #{screen.transformationStackTail}", 1, screen.rows - 1)
       screen.resetColors()
       if @playerCycle.state == 4
         screen.setForegroundColor playerColors(@cycleNumber)

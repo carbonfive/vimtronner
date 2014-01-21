@@ -88,20 +88,20 @@ class Cycle
         when directions.UP
           @y -= 1 unless @y == 0
         when directions.DOWN
-          @y += 1 unless @y == (@game.gridSize - 1)
+          @y += 1 unless @y == (@game.height - 1)
         when directions.LEFT
           @x -= 1 unless @x == 0
         when directions.RIGHT
-          @x += 1 unless @x == (@game.gridSize - 2)
+          @x += 1 unless @x == (@game.width - 1)
 
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y
 
   checkCollisions: (cycles)->
     if @state == CYCLE_STATES.RACING or @state == CYCLE_STATES.INSERTING
-      bottomWallY = (@game.gridSize - 1)
-      rightWallX = (@game.gridSize - 2)
-      if (@y == 0 or @x == 0 or @y == bottomWallY or @x == rightWallX)
+      bottomWallY = (@game.height - 1)
+      rightWallX = (@game.width - 1)
+      if (@y <= 0 or @x <= 0 or @y >= bottomWallY or @x >= rightWallX)
         @triggerCollision()
         return
       for cycle in cycles
