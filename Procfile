@@ -1,1 +1,1 @@
-web: node vimtronner.js
+web: vimtronner -S -P $PORT
