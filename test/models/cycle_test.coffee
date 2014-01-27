@@ -6,95 +6,114 @@ Game = require '../../src/models/game'
 describe 'Cycle', ->
   describe '#navigate', ->
     beforeEach ->
-      game = new Game(name: 'game')
-      @cycle = new Cycle({game: game})
+      @game = new Game(name: 'game')
+      @cycle = new Cycle({game: @game})
       @turnDown = sinon.stub @cycle, 'turnDown'
       @turnUp = sinon.stub @cycle, 'turnUp'
       @turnLeft = sinon.stub @cycle, 'turnLeft'
       @turnRight = sinon.stub @cycle, 'turnRight'
 
-    context 'cycle is not insert mode', ->
+    context 'when the game is waiting', ->
+      beforeEach -> @game.state == Game.STATES.WAITING
+
+      context 'given 27', ->
+        beforeEach -> @cycle.navigate(27)
+
+        it 'moves the bike into a non-ready state', ->
+          expect(@cycle.ready).to.not.be.true
+
+      context 'given 105', ->
+        beforeEach -> @cycle.navigate(105)
+
+        it 'moves the bike into a non-ready state', ->
+          expect(@cycle.ready).to.be.true
+
+    context 'when the cycle is ready and the game is started', ->
       beforeEach ->
-        @cycle.state = Cycle.STATES.RACING
+        @game.state = Game.STATES.STARTED
+        @cycle.ready = true
 
-      context 'given 106', ->
-        beforeEach -> @cycle.navigate(106)
+      context 'cycle is not insert mode', ->
+        beforeEach ->
+          @cycle.state = Cycle.STATES.RACING
 
-        it 'turns the cycle down', ->
-          expect(@turnDown).to.have.been.calledOnce
+        context 'given 106', ->
+          beforeEach -> @cycle.navigate(106)
 
-        it 'does not turn the cycle up', ->
-          expect(@turnUp).to.not.have.been.called
+          it 'turns the cycle down', ->
+            expect(@turnDown).to.have.been.calledOnce
 
-      context 'given 107', ->
-        beforeEach -> @cycle.navigate(107)
+          it 'does not turn the cycle up', ->
+            expect(@turnUp).to.not.have.been.called
 
-        it 'turns the cycle up', ->
-          expect(@turnUp).to.have.been.calledOnce
+        context 'given 107', ->
+          beforeEach -> @cycle.navigate(107)
 
-        it 'does not turn the cycle down', ->
+          it 'turns the cycle up', ->
+            expect(@turnUp).to.have.been.calledOnce
+
+          it 'does not turn the cycle down', ->
+            expect(@turnDown).to.not.have.been.called
+
+        context 'given 104', ->
+          beforeEach -> @cycle.navigate(104)
+
+          it 'turns the cycle left', ->
+            expect(@turnLeft).to.have.been.calledOnce
+
+          it 'does not turn the cycle up', ->
+            expect(@turnUp).to.not.have.been.called
+
+        context 'given 108', ->
+          beforeEach -> @cycle.navigate(108)
+
+          it 'turns the cycle right', ->
+            expect(@turnRight).to.have.been.calledOnce
+
+          it 'does not turn the cycle up', ->
+            expect(@turnUp).to.not.have.been.called
+
+        context 'given 27', ->
+          beforeEach -> @cycle.navigate(27)
+
+          it 'leaves insert mode', ->
+            expect(@cycle.state).to.eq Cycle.STATES.RACING
+
+        context 'given 105', ->
+          beforeEach -> @cycle.navigate(105)
+
+          it 'enters insert mode', ->
+            expect(@cycle.state).to.eq Cycle.STATES.INSERTING
+
+      context 'cycle is dead', ->
+        beforeEach ->
+          @cycle.state = Cycle.STATES.DEAD
+
+        context 'given 27', ->
+          beforeEach -> @cycle.navigate(27)
+
+          it 'stays dead', ->
+            expect(@cycle.state).to.eq Cycle.STATES.DEAD
+
+        context 'given 105', ->
+          beforeEach -> @cycle.navigate(105)
+
+          it 'stays dead', ->
+            expect(@cycle.state).to.eq Cycle.STATES.DEAD
+
+      context 'cycle is in insert mode', ->
+        beforeEach ->
+          @cycle.state = Cycle.STATES.INSERTING
+          @cycle.navigate(104)
+          @cycle.navigate(106)
+          @cycle.navigate(107)
+          @cycle.navigate(108)
+
+        it 'does not allow a change of direction', ->
           expect(@turnDown).to.not.have.been.called
-
-      context 'given 104', ->
-        beforeEach -> @cycle.navigate(104)
-
-        it 'turns the cycle left', ->
-          expect(@turnLeft).to.have.been.calledOnce
-
-        it 'does not turn the cycle up', ->
           expect(@turnUp).to.not.have.been.called
-
-      context 'given 108', ->
-        beforeEach -> @cycle.navigate(108)
-
-        it 'turns the cycle right', ->
-          expect(@turnRight).to.have.been.calledOnce
-
-        it 'does not turn the cycle up', ->
-          expect(@turnUp).to.not.have.been.called
-
-      context 'given 27', ->
-        beforeEach -> @cycle.navigate(27)
-
-        it 'leaves insert mode', ->
-          expect(@cycle.state).to.eq Cycle.STATES.RACING
-
-      context 'given 105', ->
-        beforeEach -> @cycle.navigate(105)
-
-        it 'enters insert mode', ->
-          expect(@cycle.state).to.eq Cycle.STATES.INSERTING
-
-    context 'cycle is dead', ->
-      beforeEach ->
-        @cycle.state = Cycle.STATES.DEAD
-
-      context 'given 27', ->
-        beforeEach -> @cycle.navigate(27)
-
-        it 'stays dead', ->
-          expect(@cycle.state).to.eq Cycle.STATES.DEAD
-
-      context 'given 105', ->
-        beforeEach -> @cycle.navigate(105)
-
-        it 'stays dead', ->
-          expect(@cycle.state).to.eq Cycle.STATES.DEAD
-
-    context 'cycle is in insert mode', ->
-      beforeEach ->
-        @cycle.state = Cycle.STATES.INSERTING
-        @cycle.navigate(104)
-        @cycle.navigate(106)
-        @cycle.navigate(107)
-        @cycle.navigate(108)
-
-      it 'does not allow a change of direction', ->
-        expect(@turnDown).to.not.have.been.called
-        expect(@turnUp).to.not.have.been.called
-        expect(@turnLeft).to.not.have.been.called
-        expect(@turnRight).to.not.have.been.called
-
+          expect(@turnLeft).to.not.have.been.called
+          expect(@turnRight).to.not.have.been.called
 
   describe '#step', ->
     beforeEach ->

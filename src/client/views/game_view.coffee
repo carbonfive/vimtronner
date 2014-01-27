@@ -113,7 +113,7 @@ class GameView
       'normal mode...esc'
     ]
     centerX = Math.round(@game.width/2)
-    y = Math.round(@game.height/2) - 4
+    y = Math.round(@game.height/2) - 8
     screen.setForegroundColor 6
     screen.print('vimTronner', centerX, y, screen.TEXT_ALIGN.CENTER)
     y += 2
@@ -121,7 +121,20 @@ class GameView
     screen.print(instructions[i], centerX, y + i, screen.TEXT_ALIGN.CENTER) for i in [0...instructions.length]
     y += instructions.length + 1
     screen.setForegroundColor playerColors(@cycleNumber)
-    screen.print("READY PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
+    screen.print("YOUR COLOR IS:", centerX, y, screen.TEXT_ALIGN.CENTER)
+    y++
+    screen.setBackgroundColor playerColors(@cycleNumber)
+    screen.print("    ", centerX, y, screen.TEXT_ALIGN.CENTER)
+    screen.resetColors()
+    screen.setForegroundColor playerColors(@cycleNumber)
+    y += 2
+    if @playerCycle.ready
+      screen.print("READY PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
+      screen.print("WAITING FOR OTHERS", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+    else
+      screen.print("YOU ARE PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
+      screen.print("INSERT TO ENTER", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+
     screen.resetColors()
 
   renderCountdown: ->

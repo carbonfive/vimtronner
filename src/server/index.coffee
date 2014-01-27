@@ -9,10 +9,12 @@ createGame = (attributes, server)->
   game = new Game(attributes)
   game.addListener 'game', server.onGameChange
   game.addListener 'stopped', server.onGameStopped
+  game.start()
   game
 
 class Server
-  constructor: ()->
+  constructor: (attributes={})->
+    @gameFactory = attributes.createGame ? createGame
     @games = {}
 
   getGame: (attributes) ->

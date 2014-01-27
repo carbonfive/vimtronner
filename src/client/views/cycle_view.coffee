@@ -21,6 +21,8 @@ CYCLE_EXPLOSION[2] = buffer(0xE2, 0x97, 0xAF)
 CYCLE_EXPLODED = buffer(0xF0, 0x9F, 0x92, 0x80)
 
 class CycleView
+  @CYCLE_CHARS: CYCLE_CHAR
+
   constructor: (cycle, game)->
     @cycle = cycle
     @game = game
