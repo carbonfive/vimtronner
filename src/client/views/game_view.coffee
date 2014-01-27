@@ -139,10 +139,11 @@ class GameView
 
   renderGameInfo: ->
     if @game.name? and @cycleNumber?
+      name = if @game.isPractice then 'PRACTICE' else @game.name
       screen.setBackgroundColor playerColors(@cycleNumber)
       screen.setForegroundColor 0
       screen.print((' ' for i in [1..screen.columns]).join(''), 1, screen.rows - 1)
-      screen.print("#{@game.name}  Player: #{@cycleNumber}  State: #{@stateString} #{screen.transformationStackTail}", 1, screen.rows - 1)
+      screen.print("#{name}  Player: #{@cycleNumber}  State: #{@stateString}", 1, screen.rows - 1)
       screen.resetColors()
       if @playerCycle.state == 4
         screen.setForegroundColor playerColors(@cycleNumber)

@@ -2,12 +2,15 @@ Game = require '../../src/models/game'
 Cycle = require '../../src/models/cycle'
 
 describe 'Game', ->
-  beforeEach -> @game = new Game(name: 'name')
+  beforeEach -> @game = new Game(numberOfPlayers: 2)
 
   describe 'construction', ->
-    context 'given a name', ->
-      it 'provides a game with that name', ->
-        expect(@game.name).to.eq('name')
+    context 'by default', ->
+      beforeEach -> @game = new Game()
+
+      it 'generates a random name', ->
+        expect(@game.name).to.exist
+        expect(@game.name).to.not.eq((new Game).name)
 
       it 'has an empty array of cycles', ->
         expect(@game.cycles).to.be.empty
@@ -18,14 +21,22 @@ describe 'Game', ->
       it 'provides an initial count of 3', ->
         expect(@game.count).to.eq(3)
 
-      it 'allows 2 players', ->
-        expect(@game.numberOfPlayers).to.eq(2)
+      it 'has 1 player practice mode', ->
+        expect(@game.numberOfPlayers).to.eq(1)
 
       it 'has a grid width of 80', ->
         expect(@game.width).to.eq(80)
 
       it 'has a grid height of 22', ->
         expect(@game.height).to.eq(22)
+
+    context 'given a name', ->
+      beforeEach ->
+        @name = 'my-game'
+        @game = new Game(name: @name)
+
+      it 'provides a game with that name', ->
+        expect(@game.name).to.eq(@name)
 
     context 'given a number of players', ->
       beforeEach ->
@@ -55,6 +66,9 @@ describe 'Game', ->
         expect(@game.height).to.eq(@height)
 
   describe '#addCycle', ->
+    beforeEach ->
+      @game = new Game(numberOfPlayers: 2)
+
     context 'when the game is not waiting for players', ->
       beforeEach ->
         @game.state = Game.STATES.STARTED
@@ -298,3 +312,16 @@ describe 'Game', ->
       it 'returns false', ->
         @game.state = Game.STATES.WAITING
         expect(@game.inProgress).to.be.false
+
+  describe 'isPractice', ->
+    context 'when a game has only 1 player', ->
+      beforeEach -> @game = new Game(numberOfPlayers: 1)
+
+      it 'is considered a practice game', ->
+        expect(@game.isPractice).to.be.true
+
+    context 'when a game has more than 1 player', ->
+      beforeEach -> @game = new Game(numberOfPlayers: 3)
+
+      it 'is not considered a practice game', ->
+        expect(@game.isPractice).to.be.false

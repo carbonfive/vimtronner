@@ -6,24 +6,27 @@ Client = require './client'
 exports = module.exports = (argv) ->
   program
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
-    .option('-S, --server', 'launches a server')
-    .option('-C, --client', 'launches a client')
+    .option('-S, --server', 'launches in server only mode')
+    .option('-C, --client', 'launches in client only mode')
     .option('-A, --address <address>', 'the address to connect the client', '127.0.0.1')
-    .option('-P, --port <port>', 'the port to launch the server or connect the client', 8000)
-    .option('-G, --game <game>', 'the game the client wants to join')
+    .option('-P, --port <port>', 'the port to launch the server or connect the client', 8766)
+    .option('-G, --game <game>', 'the name of the game the client wants to join')
     .option('-N, --number <number of players>', 'the number of players required to play (applies to new game only)')
     .option('-W, --width <size>', 'the grid width')
     .option('-H, --height <size>', 'the grid height')
+    .option('-L, --list', 'list active games on the server')
     .parse(argv)
 
   try
-    if program.server
+    unless program.client?
       server = new Server
       server.listen(program.port)
 
-    if program.client
+    unless program.server?
       client = new Client(program.address, program.port)
-      if program.game?
+      if program.list
+        client.listGames()
+      else
         number = parseInt(program.number, 10)
         width = parseInt(program.width)
         height = parseInt(program.height)
@@ -33,8 +36,6 @@ exports = module.exports = (argv) ->
           width: width
           height: height
         })
-      else
-        client.listGames()
   catch e
     console.log e.message
     process.exit 1

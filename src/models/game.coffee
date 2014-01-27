@@ -1,6 +1,9 @@
 require '../define_property'
+require 'moniker'
 
 { EventEmitter } = require('events')
+Moniker = require 'moniker'
+
 directions = require './directions'
 playerAttributes = require './player_attributes'
 Cycle = require './cycle'
@@ -13,9 +16,9 @@ class Game extends EventEmitter
     FINISHED: 3
   }
 
-  constructor: (attributes)->
-    @name = attributes.name
-    @numberOfPlayers = attributes.numberOfPlayers ? 2
+  constructor: (attributes={})->
+    @name = attributes.name ? Moniker.choose()
+    @numberOfPlayers = attributes.numberOfPlayers ? 1
     @width = attributes.width ? 80
     @height = attributes.height ? 22
     @cycles = []
@@ -72,7 +75,7 @@ class Game extends EventEmitter
     for cycle in @cycles
       cycle?.step()
       cycle?.checkCollisions(@cycles)
-    @checkForWinner()
+    @checkForWinner() unless @isPractice
 
   countdown: =>
     @_count -= 100
@@ -90,6 +93,7 @@ class Game extends EventEmitter
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
   @property 'inProgress', get: -> @state != Game.STATES.WAITING
+  @property 'isPractice', get: -> @numberOfPlayers == 1
   @property 'count',
     get: -> Math.ceil(@_count/1000.0)
     set: (value)-> @_count = 1000.0 * value
@@ -120,6 +124,7 @@ class Game extends EventEmitter
     width: @width
     height: @height
     cycles: (cycle.toJSON() for cycle in @cycles)
+    isPractice: @isPractice
   }
 
 module.exports = Game
