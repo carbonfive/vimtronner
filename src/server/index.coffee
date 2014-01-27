@@ -1,6 +1,8 @@
-Game = require '../models/game'
 http = require 'http'
 socketio = require 'socket.io'
+Moniker = require 'moniker'
+
+Game = require '../models/game'
 ClientSocket = require './client_socket'
 
 createGame = (attributes, server)->
@@ -14,6 +16,7 @@ class Server
     @games = {}
 
   getGame: (attributes) ->
+    attributes.name ?= Moniker.choose()
     @games[attributes.name] = (@games[attributes.name] ? createGame(attributes, @))
 
   gameList: ->

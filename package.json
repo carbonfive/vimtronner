@@ -38,7 +38,8 @@
   "dependencies": {
     "socket.io": "",
     "socket.io-client": "",
-    "commander": ""
+    "commander": "",
+    "moniker": ""
   },
   "bin": {
     "vimtronner": "./bin/vimtronner"
