@@ -8,7 +8,7 @@ exports = module.exports = (argv) ->
     .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
     .option('-S, --server', 'launches in server only mode')
     .option('-C, --client', 'launches in client only mode')
-    .option('-A, --address <address>', 'the address to connect the client', '127.0.0.1')
+    .option('-A, --address <address>', 'the address to connect the client')
     .option('-P, --port <port>', 'the port to launch the server or connect the client', 8766)
     .option('-G, --game <game>', 'the name of the game the client wants to join')
     .option('-N, --number <number of players>', 'the number of players required to play (applies to new game only)')
@@ -23,7 +23,18 @@ exports = module.exports = (argv) ->
       server.listen(program.port)
 
     unless program.server?
-      client = new Client(program.address, program.port)
+      address = if program.client
+        program.address ? 'vimtronner.herokuapp.com'
+      else
+        '127.0.0.1'
+
+      port = if address == 'vimtronner.herokuapp.com'
+        80
+      else
+        program.port
+
+      console.log address, port
+      client = new Client(address, port)
       if program.list
         client.listGames()
       else
