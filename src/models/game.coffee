@@ -25,18 +25,21 @@ class Game extends EventEmitter
     @state = Game.STATES.WAITING
     @_count = 3000
 
+  @property 'isWaiting', get: -> @state == Game.STATES.WAITING
+  @property 'isCountingDown', get: -> @state == Game.STATES.COUNTDOWN
+  @property 'isStarted', get: -> @state == Game.STATES.STARTED
+  @property 'isFinished', get: -> @state == Game.STATES.FINISHED
+  @property 'readyCycleCount', get: ->
+    count = 0
+    count++ for cycle in @cycles when cycle.ready
+    count
+
   addCycle: ->
     return null if @inProgress
-
     attributes = playerAttributes[@cycles.length]
     attributes['game'] = @
     cycle = new Cycle(attributes)
-
     @cycles.push cycle
-    if @activeCycleCount() == @numberOfPlayers
-      @start()
-    else
-      @emit 'game', @
     cycle
 
   removeCycle: (cycle)->
@@ -54,17 +57,13 @@ class Game extends EventEmitter
     count
 
   start: ->
-    @state = Game.STATES.COUNTDOWN
-    @playerPositions = @calculatePlayerPositions()
-    for cycle, i in @cycles
-      do (cycle, i)->
-      cycle.x = @playerPositions[i]['x']
-      cycle.y = @playerPositions[i]['y']
     @loop()
     @gameLoop = setInterval @loop, 100
 
   loop: =>
     switch @state
+      when Game.STATES.WAITING
+        @checkIfGameStarts()
       when Game.STATES.COUNTDOWN
         @countdown()
       when Game.STATES.STARTED
@@ -81,6 +80,15 @@ class Game extends EventEmitter
     @_count -= 100
     if @_count <= 0
       @state = Game.STATES.STARTED
+
+  checkIfGameStarts: ->
+    if @readyCycleCount == @numberOfPlayers
+      @state = Game.STATES.COUNTDOWN
+      @playerPositions = @calculatePlayerPositions()
+      for cycle, i in @cycles
+        do (cycle, i)->
+        cycle.x = @playerPositions[i]['x']
+        cycle.y = @playerPositions[i]['y']
 
   stop: ->
     clearInterval @gameLoop

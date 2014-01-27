@@ -91,21 +91,6 @@ describe 'Game', ->
       it 'adds the cycle to list of cycles', ->
         expect(@game.cycles).to.include(@addedCycle)
 
-      it 'emits a game event', ->
-        expect(@emit).to.have.been.calledWith('game', @game)
-
-      context 'and when the set number of players is not reached', ->
-
-        it 'does not start the game', ->
-          expect(@start).to.not.have.been.called
-
-      context 'and when the set number of players is reached', ->
-        beforeEach ->
-          @game.addCycle()
-
-        it 'starts the game', ->
-          expect(@start).to.have.been.called
-
   describe '#removeCycle', ->
     context 'given a cycle', ->
       beforeEach ->
@@ -164,9 +149,6 @@ describe 'Game', ->
       afterEach ->
         @clock.restore()
 
-      it 'changes the game state to countdown', ->
-        expect(@game.state).to.eq(Game.STATES.COUNTDOWN)
-
       it 'initiates a game loop to trigger every 100 milliseconds', ->
         @clock.tick(301)
         expect(@gameLoop.callCount).to.eq(4)
@@ -181,6 +163,24 @@ describe 'Game', ->
 
       it 'emits a game event', ->
         expect(@emit).to.have.been.calledWith('game', @game)
+
+    context 'when the game is waiting', ->
+      context 'and when the set number of players is not reached', ->
+        beforeEach -> @game.loop()
+
+        it 'stays in a waiting state', ->
+          expect(@game.state).to.eq(Game.STATES.WAITING)
+
+      context 'and when the set number of ready players is reached', ->
+        beforeEach ->
+          @game.cycles = [
+            { ready: true }
+            { ready: true }
+          ]
+          @game.loop()
+
+        it 'moves into the countdown state', ->
+          expect(@game.state).to.eq(Game.STATES.COUNTDOWN)
 
     context 'when the game has started', ->
       beforeEach ->

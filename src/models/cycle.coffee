@@ -43,25 +43,33 @@ class Cycle
     @state = attributes.state ? CYCLE_STATES.RACING
     @game = attributes.game
     @explosionFrame = 0
+    @ready = false
     @walls = if attributes.walls?
       (new Wall(wall) for wall in attributes.walls)
     else
       []
 
   navigate: (movement) ->
-    switch movement
-      when 27
-        @state = CYCLE_STATES.RACING if @active()
-      when 105
-        @state = CYCLE_STATES.INSERTING if @active()
-      when 106
-        @turnDown() unless @inserting()
-      when 107
-        @turnUp() unless @inserting()
-      when 104
-        @turnLeft() unless @inserting()
-      when 108
-        @turnRight() unless @inserting()
+    if @ready and @game.isStarted
+      switch movement
+        when 27
+          @state = CYCLE_STATES.RACING if @active()
+        when 105
+          @state = CYCLE_STATES.INSERTING if @active()
+        when 106
+          @turnDown() unless @inserting()
+        when 107
+          @turnUp() unless @inserting()
+        when 104
+          @turnLeft() unless @inserting()
+        when 108
+          @turnRight() unless @inserting()
+    else if @game.isWaiting
+      switch movement
+        when 27
+          @ready = false
+        when 105
+          @ready = true
 
   inserting: ->
     @state == CYCLE_STATES.INSERTING
@@ -139,6 +147,7 @@ class Cycle
     direction: @direction
     explosionFrame: @explosionFrame
     walls: (wall.toJSON() for wall in @walls)
+    ready: @ready
   }
 
 module.exports = Cycle

@@ -5,9 +5,14 @@ http = require 'http'
 socketio = require('socket.io-client')
 
 describe 'Server', ->
-  beforeEach -> @server = new Server
+  beforeEach ->
+    @server = new Server
 
   describe '#getGame', ->
+    beforeEach ->
+      sinon.stub @server, 'onGameChange'
+      sinon.stub @server, 'onGameStopped'
+
     context 'given the attributes of a game', ->
       beforeEach ->
         @name = 'My game name'
