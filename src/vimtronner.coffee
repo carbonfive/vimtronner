@@ -33,7 +33,6 @@ exports = module.exports = (argv) ->
       else
         program.port
 
-      console.log address, port
       client = new Client(address, port)
       if program.list
         client.listGames()

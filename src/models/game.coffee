@@ -14,9 +14,11 @@ class Game extends EventEmitter
     COUNTDOWN: 1
     STARTED: 2
     FINISHED: 3
+    RESTARTING: 4
   }
 
   constructor: (attributes={})->
+    @lastUpdated = Date.now()
     @name = attributes.name ? Moniker.choose()
     @numberOfPlayers = attributes.numberOfPlayers ? 1
     @width = attributes.width ? 80
@@ -29,10 +31,20 @@ class Game extends EventEmitter
   @property 'isCountingDown', get: -> @state == Game.STATES.COUNTDOWN
   @property 'isStarted', get: -> @state == Game.STATES.STARTED
   @property 'isFinished', get: -> @state == Game.STATES.FINISHED
+  @property 'isRestarting', get: -> @state == Game.STATES.RESTARTING
   @property 'readyCycleCount', get: ->
     count = 0
     count++ for cycle in @cycles when cycle.ready
     count
+  @property 'activeCycleCount', get: ->
+    count = 0
+    count++ for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
+    count
+  @property 'outdated', get: ->
+    (Date.now() - @lastUpdated) > 180000
+
+  touch: =>
+    @lastUpdated = Date.now()
 
   addCycle: ->
     return null if @inProgress
@@ -40,21 +52,23 @@ class Game extends EventEmitter
     attributes['game'] = @
     cycle = new Cycle(attributes)
     @cycles.push cycle
+    @touch()
     cycle
 
   removeCycle: (cycle)->
+    @touch()
     index = @cycles.indexOf cycle
     @cycles.splice index, 1
     @checkForWinner()
+    @checkKillGame()
 
   checkForWinner: ->
-    if @activeCycleCount() <= 1
-      @stop()
+    if @activeCycleCount == 1
+      @finishGame()
 
-  activeCycleCount: ->
-    count = 0
-    count++ for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
-    count
+  checkKillGame: ->
+    if @activeCycleCount < 1
+      @stop()
 
   start: ->
     @loop()
@@ -62,7 +76,7 @@ class Game extends EventEmitter
 
   loop: =>
     switch @state
-      when Game.STATES.WAITING
+      when Game.STATES.WAITING and Game.STATES.RESTARTING
         @checkIfGameStarts()
       when Game.STATES.COUNTDOWN
         @countdown()
@@ -90,11 +104,12 @@ class Game extends EventEmitter
         cycle.x = @playerPositions[i]['x']
         cycle.y = @playerPositions[i]['y']
 
-  stop: ->
-    clearInterval @gameLoop
+  finishGame: ->
     @state = Game.STATES.FINISHED
     @determineWinner()
-    @emit 'game', @
+
+  stop: ->
+    clearInterval @gameLoop
     @emit 'stopped', @
 
   determineWinner: ->

@@ -51,6 +51,7 @@ class Cycle
 
   navigate: (movement) ->
     if @ready and @game.isStarted
+      @game.touch()
       switch movement
         when 27
           @state = CYCLE_STATES.RACING if @active()
@@ -64,7 +65,8 @@ class Cycle
           @turnLeft() unless @inserting()
         when 108
           @turnRight() unless @inserting()
-    else if @game.isWaiting
+    else if @game.isWaiting or @game.isRestarting
+      @game.touch()
       switch movement
         when 27
           @ready = false
