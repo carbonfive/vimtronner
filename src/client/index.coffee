@@ -34,6 +34,16 @@ class Client
   connect: (callback)->
     @socket = socketio.connect("http://#{@address}:#{@port}")
     @socket.on 'connect', callback
+    @socket.on 'connect_error', @connectError
+    @socket.on 'connect_timeout', @connectError
+    @socket.on 'error', @connectError
+    @socket.on 'connecting', ->
+      process.stdout.write "Connecting to #{url} ...\n"
+
+  connectError: =>
+    url = "http://#{@address}:#{@port}"
+    process.stdout.write "Failed to connect to #{url}\n"
+    process.exit 1
 
   andJoinGame: =>
     process.on 'SIGINT', @onSigInt
