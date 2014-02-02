@@ -29,7 +29,7 @@ describe 'ClientSocket', ->
       it 'listens for list events on the socket', ->
         expect(@socket.on).to.have.been.calledWith('list', @clientSocket.onList)
 
-  describe 'onJoin', ->
+  describe '#onJoin', ->
     context 'given a name and a callback', ->
       beforeEach ->
         @name = 'aName'
@@ -44,7 +44,6 @@ describe 'ClientSocket', ->
         context 'and the game can add cycles', ->
           beforeEach ->
             @cycle = sinon.createStubInstance(Cycle)
-            @cycle.number = 3
             @game.addCycle.returns(@cycle)
             @gameJSON = { foo: 'bar' }
             @game.toJSON.returns @gameJSON

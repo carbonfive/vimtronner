@@ -94,6 +94,7 @@ describe 'Game', ->
   describe '#removeCycle', ->
     context 'given a cycle', ->
       beforeEach ->
+        @game.state = Game.STATES.STARTED
         @winnerCheck = sinon.stub(@game, 'checkForWinner')
         @firstCycle = sinon.createStubInstance(Cycle)
         @secondCycle = sinon.createStubInstance(Cycle)
@@ -111,7 +112,7 @@ describe 'Game', ->
 
   describe '#checkForWinner', ->
     beforeEach ->
-      @stop = sinon.stub @game, 'stop'
+      @stop = sinon.stub @game, 'finishGame'
 
     context 'given more than 1 active cycle', ->
       beforeEach ->
@@ -206,9 +207,9 @@ describe 'Game', ->
       beforeEach ->
         expect(@game.count).to.eq(3)
 
-      context 'and after called 10 times', ->
+      context 'and after called 20 times', ->
         beforeEach ->
-          @game.countdown() for i in [1..10]
+          @game.countdown() for i in [1..20]
 
         it 'decreases the count by 1', ->
           expect(@game.count).to.eq(2)
@@ -217,19 +218,30 @@ describe 'Game', ->
       beforeEach ->
         @game.count = 1
 
-      context 'and after called 10 times', ->
+      context 'and after called 20 times', ->
         beforeEach ->
-          @game.countdown() for i in [1..1000]
+          @game.countdown() for i in [1..21]
 
         it 'changes the game state to started', ->
           expect(@game.state).to.eq(Game.STATES.STARTED)
 
+  describe '#finishGame', ->
+    context 'when called', ->
+      beforeEach ->
+        sinon.stub(@game, 'determineWinner')
+        @game.finishGame()
+
+      it 'changes the game state to finished', ->
+        expect(@game.state).to.eq(Game.STATES.FINISHED)
+
+      it 'determines the winner', ->
+        expect(@game.determineWinner).to.have.been.calledOnce
+
   describe '#stop', ->
     context 'when called', ->
       beforeEach ->
+        sinon.stub(@game, 'emit')
         @clock = sinon.useFakeTimers()
-        @determineWinner = sinon.stub(@game, 'determineWinner')
-        @emit = sinon.stub(@game, 'emit')
 
         @fake = sinon.stub()
         @game.gameLoop = setInterval @fake, 100
@@ -245,17 +257,8 @@ describe 'Game', ->
         @clock.tick(201)
         expect(@fake).to.not.have.been.calledTwice
 
-      it 'changes the game state to finished', ->
-        expect(@game.state).to.eq(Game.STATES.FINISHED)
-
-      it 'determines the winner', ->
-        expect(@determineWinner).to.have.been.calledOnce
-
-      it 'emits a game event', ->
-        expect(@emit).to.have.been.calledWith('game', @game)
-
       it 'emits a stopped event', ->
-        expect(@emit).to.have.been.calledWith('stopped', @game)
+        expect(@game.emit).to.have.been.calledWith('stopped', @game)
 
   describe '#determineWinner', ->
     context 'given a single cycle is racing', ->

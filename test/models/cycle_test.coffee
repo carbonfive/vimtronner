@@ -2,12 +2,13 @@ directions = require '../../src/models/directions'
 Cycle = require '../../src/models/cycle'
 Wall = require '../../src/models/wall'
 Game = require '../../src/models/game'
+playerAttributes = require '../../src/models/player_attributes'
 
 describe 'Cycle', ->
   describe '#navigate', ->
     beforeEach ->
       @game = new Game(name: 'game')
-      @cycle = new Cycle({game: @game})
+      @cycle = new Cycle({game: @game, player: playerAttributes[0]})
       @turnDown = sinon.stub @cycle, 'turnDown'
       @turnUp = sinon.stub @cycle, 'turnUp'
       @turnLeft = sinon.stub @cycle, 'turnLeft'
@@ -120,7 +121,11 @@ describe 'Cycle', ->
       width = Math.floor(Math.random() * 100) + 80
       height = Math.floor(Math.random() * 100) + 22
       @game = new Game({name: 'game', width: width, height: height})
-      @cycle = new Cycle({direction: directions.RIGHT, game: @game})
+      @cycle = new Cycle({
+        direction: directions.RIGHT,
+        game: @game
+        player: playerAttributes[0]
+      })
 
     context 'given the cycle is exploding', ->
       beforeEach ->

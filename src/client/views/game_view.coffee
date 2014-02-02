@@ -65,10 +65,12 @@ class GameView
     screen.hideCursor()
     screen.save()
     screen.transform(@startX, @startY)
-    if @state == Game.STATES.WAITING
+    if @state == Game.STATES.WAITING or (@state == Game.STATES.RESTARTING and @playerCycle.ready)
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
       @renderCountdown()
+    else if @state == Game.STATES.FINISHED or @state == Game.STATES.RESTARTING
+      @renderFinishScreen()
     else
       @renderArena()
       @renderCycleViews()
@@ -130,10 +132,16 @@ class GameView
     y += 2
     if @playerCycle.ready
       screen.print("READY PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
-      screen.print("WAITING FOR OTHERS", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+      screen.print("WAITING FOR", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+      n = @game.numberOfPlayers - @numberOfReadyPlayers
+      screen.print("#{n} PLAYER#{if n > 1 then 'S' else ''}", centerX, y + 2, screen.TEXT_ALIGN.CENTER)
     else
       screen.print("YOU ARE PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y, screen.TEXT_ALIGN.CENTER)
-      screen.print("INSERT TO ENTER", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+      screen.print("ENTER INSERT MODE TO", centerX, y + 1, screen.TEXT_ALIGN.CENTER)
+      if @game.isPractice
+        screen.print("START PRACTICE GAME", centerX, y + 2, screen.TEXT_ALIGN.CENTER)
+      else
+        screen.print("WHEN YOU ARE READY", centerX, y + 2, screen.TEXT_ALIGN.CENTER)
 
     screen.resetColors()
 
@@ -150,6 +158,31 @@ class GameView
   renderCycleViews: ->
     cycleView.render() for cycleView in @cycleViews
 
+  renderFinishScreen: ->
+    @renderArena()
+
+    centerX = Math.round(@game.width/2)
+    y = Math.round(@game.height/2) - 3
+
+    screen.print 'GAME OVER', centerX, y, screen.TEXT_ALIGN.CENTER
+
+    y +=2
+    screen.setForegroundColor playerColors(@cycleNumber)
+    if @game.isPractice
+      screen.print 'READY FOR A REAL GAME?', centerX, y, screen.TEXT_ALIGN.CENTER
+    else
+      if @playerCycle.state == Cycle.STATES.WINNER
+        screen.print 'YOU WON!!!', centerX, y, screen.TEXT_ALIGN.CENTER
+      else
+        screen.print 'YOU LOST!!!', centerX, y, screen.TEXT_ALIGN.CENTER
+
+    screen.resetColors()
+    y += 2
+    screen.print "ENTER INSERT MODE", centerX, y, screen.TEXT_ALIGN.CENTER
+    screen.print "FOR REMATCH", centerX, y + 1, screen.TEXT_ALIGN.CENTER
+    screen.resetColors()
+
+
   renderGameInfo: ->
     if @game.name? and @cycleNumber?
       name = if @game.isPractice then 'PRACTICE' else @game.name
@@ -165,5 +198,11 @@ class GameView
 
   @property 'playerCycle', get: ->
     (cycle for cycle in @_game.cycles when cycle.number == @cycleNumber).pop()
+
+  @property 'numberOfReadyPlayers', get: ->
+    @game.cycles.reduce(
+      ((total, cycle)->
+        if cycle.ready then total + 1 else total
+      ), 0)
 
 module.exports = GameView

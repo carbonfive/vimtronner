@@ -2,6 +2,7 @@ program = require 'commander'
 fs = require 'fs'
 Server = require './server'
 Client = require './client'
+screen = require './client/screen'
 
 exports = module.exports = (argv) ->
   program
@@ -12,8 +13,8 @@ exports = module.exports = (argv) ->
     .option('-P, --port <port>', 'the port to launch the server or connect the client', 8766)
     .option('-G, --game <game>', 'the name of the game the client wants to join')
     .option('-N, --number <number of players>', 'the number of players required to play (applies to new game only)')
-    .option('-W, --width <size>', 'the grid width')
-    .option('-H, --height <size>', 'the grid height')
+    .option('-W, --width <size>', 'the grid width', screen.columns)
+    .option('-H, --height <size>', 'the grid height', screen.rows - 2)
     .option('-L, --list', 'list active games on the server')
     .parse(argv)
 
@@ -33,14 +34,13 @@ exports = module.exports = (argv) ->
       else
         program.port
 
-      console.log address, port
       client = new Client(address, port)
       if program.list
         client.listGames()
       else
         number = parseInt(program.number, 10)
-        width = parseInt(program.width)
-        height = parseInt(program.height)
+        width = parseInt(program.width, 10)
+        height = parseInt(program.height, 10)
         client.join({
           name: program.game
           numberOfPlayers: number

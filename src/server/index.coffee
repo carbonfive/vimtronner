@@ -28,9 +28,11 @@ class Server
     @io.sockets.in(game.name).emit 'game', game.toJSON()
 
   onGameStopped: (game)=>
+    socket.disconnect() for socket in @io.sockets.clients(game.name)
     delete @games[game.name]
 
   listen: (@port=8000, options..., cb=(->))=>
+    @checkDeadGameInterval = setInterval @checkForDeadGames, 180000
     collectedOptions = { log: false }
     for option in options
       for key, value of option
@@ -40,6 +42,10 @@ class Server
     @io.sockets.on 'connection', @onConnection
     @server.listen @port, cb
 
+  checkForDeadGames: =>
+    games = (game for name, game of @games)
+    game.stop() for game in games when game.outdated
+
   onConnection: (socket)=>
     new ClientSocket(socket, @)
 
@@ -47,6 +53,8 @@ class Server
     response.writeHead 200
     response.end 'Hello, world!'
 
-  close: (cb=(->))-> @server?.close cb
+  close: (cb=(->))->
+    clearInterval @checkDeadGameInterval
+    @server?.close cb
 
 module.exports = Server

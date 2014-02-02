@@ -5,23 +5,27 @@ GameListView = require './views/game_list_view'
 
 class Client
   constructor: (@address="127.0.0.1", @port=8000)->
+    @errorMessages = []
 
   join: (@gameAttributes)->
-    @gameAttributes.width = screen.columns
-    @gameAttributes.height = screen.rows - 2
+    @gameAttributes.width ?= screen.columns
+    @gameAttributes.height ?= screen.rows - 2
     @checkValidity()
     @gameView = gameView = new GameView
     @connect(@andJoinGame)
 
   checkValidity: ->
     invalid = (
-      @gameAttributes.width < 22 or
+      @gameAttributes.width < 80 or
       @gameAttributes.height < 22 or
       @gameAttributes.width > screen.columns or
       @gameAttributes.height > screen.rows - 2
     )
     (throw new Error(
-      "Width and height but be no smaller than 22 and no bigger than screen size"
+      """
+      Width must be no smaller than 80 and no greater than #{screen.columns}.
+      Height must be no smaller than 22 and no greater than #{screen.rows - 2}.
+      """
     )) if invalid
 
   listGames: ->
@@ -41,6 +45,7 @@ class Client
       @cycleNumber = cycleNumber
       @onGameUpdate(game)
       @socket.on 'game', @onGameUpdate
+      @socket.on 'disconnect', @quit
 
   onData: (chunk)=>
     switch chunk[0]
@@ -54,7 +59,17 @@ class Client
     process.kill process.pid, 'SIGINT'
 
   onSigInt: =>
+    screen.resetAll()
     screen.showCursor()
+    screen.clear()
+
+    if @errorMessages.length > 0
+      process.stdout.write '\nERROR MESSAGES'
+      process.stdout.write '\n--------------'
+      process.stdout.write("\n#{message}") for message in @errorMessages
+      process.stdout.write '\n--------------\n\n'
+
+    process.stdout.write 'End of line.\n'
     process.nextTick process.exit
 
   onGameUpdate: (game)=>
@@ -73,7 +88,7 @@ class Client
     @socket.disconnect()
 
   showErrorMessage: (message) =>
-    console.log message
+    @errorMessages.push message
     @quit()
 
   storeCycle: (cycle)=> @cycle = cycle

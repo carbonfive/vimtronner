@@ -10,6 +10,8 @@ class ClientGameSocket
     @socket.leave @game.name
     @game.removeCycle @cycle
 
-  onMovement: (movement)=> @cycle.navigate(movement)
+  onMovement: (movement)=>
+    @game.touch()
+    @cycle.navigate(movement)
 
 module.exports = ClientGameSocket
