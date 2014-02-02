@@ -46,11 +46,7 @@ class CycleView
     nextX = (@cycle.x) + 1
     screen.moveTo(nextX, @cycle.y + 1)
     process.stdout.write @character()
-
     @renderWallViews()
-
-    if @cycle.state == Cycle.STATES.WINNER
-      @renderWinnerMessage()
 
   generateWallViews: ->
     @wallViews = (new WallView(wall) for wall in @cycle.walls)

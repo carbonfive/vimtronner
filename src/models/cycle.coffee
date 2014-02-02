@@ -1,3 +1,5 @@
+require '../define_property'
+playerAttributes = require './player_attributes'
 directions = require './directions'
 Wall = require './wall'
 
@@ -35,12 +37,13 @@ class Cycle
   @STATES: CYCLE_STATES
 
   constructor: (attributes={})->
-    @number = attributes.number
-    @x = attributes.x
-    @y = attributes.y
-    @direction = attributes.direction
-    @color = attributes.color
-    @state = attributes.state ? CYCLE_STATES.RACING
+    @player = attributes.player ? playerAttributes[0]
+    @x = 0
+    @y = 0
+    @direction = attributes.direction ? attributes.player?.direction ? directions.LEFT
+    @number = attributes.number ? attributes.player?.number ? 1
+    @color = attributes.color ? attributes.player?.color ? 1
+    @state = CYCLE_STATES.RACING
     @game = attributes.game
     @explosionFrame = 0
     @ready = false
@@ -49,60 +52,76 @@ class Cycle
     else
       []
 
+  @property 'inserting', get: ->
+    @state == CYCLE_STATES.INSERTING
+
+  @property 'racing', get: ->
+    @state == CYCLE_STATES.RACING
+
+  @property 'active', get: ->
+    @inserting or @racing
+
   navigate: (movement) ->
     if @ready and @game.isStarted
       @game.touch()
       switch movement
         when 27
-          @state = CYCLE_STATES.RACING if @active()
+          @state = CYCLE_STATES.RACING if @active
         when 105
-          @state = CYCLE_STATES.INSERTING if @active()
+          @state = CYCLE_STATES.INSERTING if @active
         when 106
-          @turnDown() unless @inserting()
+          @turnDown() unless @inserting
         when 107
-          @turnUp() unless @inserting()
+          @turnUp() unless @inserting
         when 104
-          @turnLeft() unless @inserting()
+          @turnLeft() unless @inserting
         when 108
-          @turnRight() unless @inserting()
-    else if @game.isWaiting or @game.isRestarting
+          @turnRight() unless @inserting
+    else if @game.isWaiting or @game.isRestarting or @game.isFinished
       @game.touch()
       switch movement
         when 27
           @ready = false
         when 105
           @ready = true
-
-  inserting: ->
-    @state == CYCLE_STATES.INSERTING
-
-  active: ->
-    @state == CYCLE_STATES.INSERTING or @state == CYCLE_STATES.RACING
+          @state = CYCLE_STATES.RACING
 
   step: ->
-    if @state == CYCLE_STATES.EXPLODING
-      if @explosionFrame <= 10
-        @explosionFrame++
+    switch @state
+      when CYCLE_STATES.EXPLODING
+        @explosionStep()
+      when CYCLE_STATES.DEAD
+        return
       else
-        @state = CYCLE_STATES.DEAD
-    else
-      if @state == CYCLE_STATES.INSERTING
-        @walls.push new Wall({
-          x: @x
-          y: @y
-          type: @nextWallType()
-          direction: @direction
-        })
+        @movingStep()
 
-      switch @direction
-        when directions.UP
-          @y -= 1 unless @y == 0
-        when directions.DOWN
-          @y += 1 unless @y == (@game.height - 1)
-        when directions.LEFT
-          @x -= 1 unless @x == 0
-        when directions.RIGHT
-          @x += 1 unless @x == (@game.width - 1)
+  movingStep: ->
+    if @inserting
+      @addWall()
+
+    switch @direction
+      when directions.UP
+        @y -= 1 unless @y == 0
+      when directions.DOWN
+        @y += 1 unless @y == (@game.height - 1)
+      when directions.LEFT
+        @x -= 1 unless @x == 0
+      when directions.RIGHT
+        @x += 1 unless @x == (@game.width - 1)
+
+  addWall: ->
+    @walls.push new Wall({
+      x: @x
+      y: @y
+      type: @nextWallType()
+      direction: @direction
+    })
+
+  explosionStep: =>
+    if @explosionFrame <= 10
+      @explosionFrame++
+    else
+      @state = CYCLE_STATES.DEAD
 
   checkCollisionWith: (object)->
     @x == object.x and @y == object.y

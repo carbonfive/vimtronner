@@ -21,11 +21,12 @@ class Game extends EventEmitter
     @lastUpdated = Date.now()
     @name = attributes.name ? Moniker.choose()
     @numberOfPlayers = attributes.numberOfPlayers ? 1
+    @availablePlayers = (playerAttributes[n] for n in [0...@numberOfPlayers]).reverse()
     @width = attributes.width ? 80
     @height = attributes.height ? 22
     @cycles = []
     @state = Game.STATES.WAITING
-    @_count = 3000
+    @_count = 6000
 
   @property 'isWaiting', get: -> @state == Game.STATES.WAITING
   @property 'isCountingDown', get: -> @state == Game.STATES.COUNTDOWN
@@ -47,9 +48,12 @@ class Game extends EventEmitter
     @lastUpdated = Date.now()
 
   addCycle: ->
-    return null if @inProgress
-    attributes = playerAttributes[@cycles.length]
-    attributes['game'] = @
+    return null if @inProgress or @availablePlayers.length == 0
+    player = @availablePlayers.pop()
+    attributes = {
+      player: player
+      game: @
+    }
     cycle = new Cycle(attributes)
     @cycles.push cycle
     @touch()
@@ -57,13 +61,15 @@ class Game extends EventEmitter
 
   removeCycle: (cycle)->
     @touch()
+    @availablePlayers.push cycle.player
     index = @cycles.indexOf cycle
     @cycles.splice index, 1
-    @checkForWinner()
+    @checkForWinner() if @inProgress
     @checkKillGame()
 
   checkForWinner: ->
-    if @activeCycleCount == 1
+    endGameCount = if @isPractice then 0 else 1
+    if @activeCycleCount <= endGameCount
       @finishGame()
 
   checkKillGame: ->
@@ -76,19 +82,21 @@ class Game extends EventEmitter
 
   loop: =>
     switch @state
-      when Game.STATES.WAITING and Game.STATES.RESTARTING
+      when Game.STATES.WAITING, Game.STATES.RESTARTING
         @checkIfGameStarts()
       when Game.STATES.COUNTDOWN
         @countdown()
       when Game.STATES.STARTED
         @runGame()
+      when Game.STATES.FINISHED
+        @checkIfGameRestarting()
     @emit 'game', @
 
   runGame: =>
     for cycle in @cycles
       cycle?.step()
       cycle?.checkCollisions(@cycles)
-    @checkForWinner() unless @isPractice
+    @checkForWinner()
 
   countdown: =>
     @_count -= 100
@@ -98,15 +106,23 @@ class Game extends EventEmitter
   checkIfGameStarts: ->
     if @readyCycleCount == @numberOfPlayers
       @state = Game.STATES.COUNTDOWN
-      @playerPositions = @calculatePlayerPositions()
+      playerPositions = @calculatePlayerPositions()
       for cycle, i in @cycles
-        do (cycle, i)->
-        cycle.x = @playerPositions[i]['x']
-        cycle.y = @playerPositions[i]['y']
+        i = Math.floor(Math.random() * playerPositions.length)
+        playerPosition = playerPositions[i]
+        playerPositions.splice i, 1
+        cycle.x = playerPosition['x']
+        cycle.y = playerPosition['y']
+        cycle.direction = playerPosition['direction']
+
+  checkIfGameRestarting: ->
+    if @cycles.some((cycle)-> cycle.ready)
+      @state = Game.STATES.RESTARTING
 
   finishGame: ->
     @state = Game.STATES.FINISHED
-    @determineWinner()
+    (cycle.ready = false for cycle in @cycles)
+    @determineWinner() unless @isPractice
 
   stop: ->
     clearInterval @gameLoop
@@ -115,11 +131,11 @@ class Game extends EventEmitter
   determineWinner: ->
     cycle.makeWinner() for cycle in @cycles when cycle.state != Cycle.STATES.DEAD
 
-  @property 'inProgress', get: -> @state != Game.STATES.WAITING
+  @property 'inProgress', get: -> @state != Game.STATES.WAITING and @state != Game.STATES.RESTARTING
   @property 'isPractice', get: -> @numberOfPlayers == 1
   @property 'count',
-    get: -> Math.ceil(@_count/1000.0)
-    set: (value)-> @_count = 1000.0 * value
+    get: -> Math.ceil(@_count/2000.0)
+    set: (value)-> @_count = 2000.0 * value
 
   calculatePlayerPositions: ->
     minXDistance = 3
@@ -129,14 +145,14 @@ class Game extends EventEmitter
     maxYDistance = @height - minXDistance
     halfYDistance = Math.round(@height / 2)
     [
-      { x: minXDistance, y: minYDistance }
-      { x: maxXDistance, y: maxYDistance }
-      { x: minXDistance, y: maxYDistance }
-      { x: maxXDistance, y: minYDistance }
-      { x: halfXDistance, y: minYDistance }
-      { x: halfXDistance, y: maxYDistance }
-      { x: minXDistance, y: halfYDistance }
-      { x: maxXDistance, y: halfYDistance }
+      { x: minXDistance, y: minYDistance, direction: directions.RIGHT }
+      { x: maxXDistance, y: maxYDistance, direction: directions.LEFT }
+      { x: minXDistance, y: maxYDistance, direction: directions.UP }
+      { x: maxXDistance, y: minYDistance, direction: directions.DOWN }
+      { x: halfXDistance, y: minYDistance, direction: directions.DOWN }
+      { x: halfXDistance, y: maxYDistance, direction: directions.UP }
+      { x: minXDistance, y: halfYDistance, direction: directions.RIGHT }
+      { x: maxXDistance, y: halfYDistance, direction: directions.LEFT }
     ]
 
   toJSON: -> {

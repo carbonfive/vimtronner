@@ -94,6 +94,7 @@ describe 'Game', ->
   describe '#removeCycle', ->
     context 'given a cycle', ->
       beforeEach ->
+        @game.state = Game.STATES.STARTED
         @winnerCheck = sinon.stub(@game, 'checkForWinner')
         @firstCycle = sinon.createStubInstance(Cycle)
         @secondCycle = sinon.createStubInstance(Cycle)
@@ -206,9 +207,9 @@ describe 'Game', ->
       beforeEach ->
         expect(@game.count).to.eq(3)
 
-      context 'and after called 10 times', ->
+      context 'and after called 20 times', ->
         beforeEach ->
-          @game.countdown() for i in [1..10]
+          @game.countdown() for i in [1..20]
 
         it 'decreases the count by 1', ->
           expect(@game.count).to.eq(2)
@@ -217,9 +218,9 @@ describe 'Game', ->
       beforeEach ->
         @game.count = 1
 
-      context 'and after called 10 times', ->
+      context 'and after called 20 times', ->
         beforeEach ->
-          @game.countdown() for i in [1..1000]
+          @game.countdown() for i in [1..21]
 
         it 'changes the game state to started', ->
           expect(@game.state).to.eq(Game.STATES.STARTED)

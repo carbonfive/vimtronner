@@ -8,21 +8,24 @@ class Client
     @errorMessages = []
 
   join: (@gameAttributes)->
-    @gameAttributes.width = screen.columns
-    @gameAttributes.height = screen.rows - 2
+    @gameAttributes.width ?= screen.columns
+    @gameAttributes.height ?= screen.rows - 2
     @checkValidity()
     @gameView = gameView = new GameView
     @connect(@andJoinGame)
 
   checkValidity: ->
     invalid = (
-      @gameAttributes.width < 22 or
+      @gameAttributes.width < 80 or
       @gameAttributes.height < 22 or
       @gameAttributes.width > screen.columns or
       @gameAttributes.height > screen.rows - 2
     )
     (throw new Error(
-      "Width and height but be no smaller than 22 and no bigger than screen size"
+      """
+      Width must be no smaller than 80 and no greater than #{screen.columns}.
+      Height must be no smaller than 22 and no greater than #{screen.rows - 2}.
+      """
     )) if invalid
 
   listGames: ->
@@ -57,6 +60,7 @@ class Client
 
   onSigInt: =>
     screen.resetAll()
+    screen.showCursor()
     screen.clear()
 
     if @errorMessages.length > 0
