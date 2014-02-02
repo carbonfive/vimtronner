@@ -19,18 +19,27 @@ class Client
     @connect(@andJoinGame)
 
   checkValidity: ->
-    invalid = (
-      @gameAttributes.width < 80 or
-      @gameAttributes.height < 22 or
-      @gameAttributes.width > screen.columns or
-      @gameAttributes.height > screen.rows - 2
-    )
+    errorChecks = {
+      "Width cannot be smaller than 80": =>
+        @gameAttributes.width < 80
+      "Width cannot be greater than screen size": =>
+        @gameAttributes.width > screen.columns
+      "Height cannot be smaller than 22": =>
+        @gameAttributes.width < 22
+      "Height cannot be greater than screen size": =>
+        @gameAttributes.height > screen.rows - 2
+      "Number of players must be between 1 to 6": =>
+        @gameAttributes.numberOfPlayers < 1 or
+          @gameAttributes.numberOfPlayers > 6
+    }
+    errors = (message for message, check of errorChecks when check())
     (throw new Error(
       """
-      Width must be no smaller than 80 and no greater than #{screen.columns}.
-      Height must be no smaller than 22 and no greater than #{screen.rows - 2}.
+      The game parameters are invalid:
+
+      #{errors.join '\n'}
       """
-    )) if invalid
+    )) if errors.length > 0
 
   listGames: ->
     @connect(@andListGames)

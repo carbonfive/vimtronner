@@ -4,12 +4,12 @@ module.exports = [
     {
       number: 1
       direction: directions.RIGHT
-      color: 7
+      color: 6
     }
     {
       number: 2
       direction: directions.LEFT
-      color: 2
+      color: 1
     }
     {
       number: 3
@@ -19,26 +19,16 @@ module.exports = [
     {
       number: 4
       direction: directions.DOWN
-      color: 5
+      color: 4
     }
     {
       number: 5
       direction: directions.DOWN
-      color: 6
+      color: 7
     }
     {
       number: 6
       direction: directions.UP
-      color: 7
-    }
-    {
-      number: 7
-      direction: directions.RIGHT
-      color: 4
-    }
-    {
-      number: 8
-      direction: directions.LEFT
-      color: 1
+      color: 2
     }
   ]
