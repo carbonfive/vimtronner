@@ -105,6 +105,7 @@ class Game extends EventEmitter
 
   checkIfGameStarts: ->
     if @readyCycleCount == @numberOfPlayers
+      @_count = 6000
       @state = Game.STATES.COUNTDOWN
       playerPositions = @calculatePlayerPositions()
       for cycle, i in @cycles
@@ -117,6 +118,7 @@ class Game extends EventEmitter
 
   checkIfGameRestarting: ->
     if @cycles.some((cycle)-> cycle.ready)
+      cycle.walls = [] for cycle in @cycles
       @state = Game.STATES.RESTARTING
 
   finishGame: ->

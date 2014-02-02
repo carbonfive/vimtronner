@@ -39,9 +39,13 @@ class GameView
   @property 'game', {
     set: (game)->
       @_game = game
-      if @_game.count != @lastCount and @state == Game.STATES.COUNTDOWN
-        @lastCount = @_game.count
-        @countString += "#{@_game.count}..."
+      if @state == Game.STATES.COUNTDOWN
+        if @_game.count != @lastCount and @state == Game.STATES.COUNTDOWN
+          @lastCount = @_game.count
+          @countString += "#{@_game.count}..."
+      else
+        delete @lastCount
+        @countString = ''
       @generateCycleViews()
     get: -> @_game
   }
