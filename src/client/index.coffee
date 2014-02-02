@@ -50,7 +50,7 @@ class Client
     @socket.on 'connect_error', @connectError
     @socket.on 'connect_timeout', @connectError
     @socket.on 'error', @connectError
-    @socket.on 'connecting', ->
+    @socket.on 'connecting', =>
       process.stdout.write "Connecting to #{@url} ...\n"
 
   connectError: =>
