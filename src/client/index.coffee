@@ -1,4 +1,6 @@
 socketio = require('socket.io-client')
+
+require '../define_property'
 screen = require './screen'
 GameView = require './views/game_view'
 GameListView = require './views/game_list_view'
@@ -6,6 +8,8 @@ GameListView = require './views/game_list_view'
 class Client
   constructor: (@address="127.0.0.1", @port=8000)->
     @errorMessages = []
+
+  @property 'url', get: -> "http://#{@address}:#{@port}"
 
   join: (@gameAttributes)->
     @gameAttributes.width ?= screen.columns
@@ -32,17 +36,16 @@ class Client
     @connect(@andListGames)
 
   connect: (callback)->
-    @socket = socketio.connect("http://#{@address}:#{@port}")
+    @socket = socketio.connect(@url)
     @socket.on 'connect', callback
     @socket.on 'connect_error', @connectError
     @socket.on 'connect_timeout', @connectError
     @socket.on 'error', @connectError
     @socket.on 'connecting', ->
-      process.stdout.write "Connecting to #{url} ...\n"
+      process.stdout.write "Connecting to #{@url} ...\n"
 
   connectError: =>
-    url = "http://#{@address}:#{@port}"
-    process.stdout.write "Failed to connect to #{url}\n"
+    process.stdout.write "Failed to connect to #{@url}\n"
     process.exit 1
 
   andJoinGame: =>
