@@ -274,5 +274,5 @@ welcome!
 * [Rudy Jahchan](/rudyjahchan) - [@rudy](http://twitter.com/rudy)
 
 [vimtronner]: http://github.com/carbonfive/vimtronner
-[game_name_location_img]:http://carbonfive.github.io/vimtronner/images/vimtronner-name.png
-[game_play_img]: http://carbonfive.github.io/vimtronner/images/vimtronner1.gif
+[game_name_location_img]:http://carbonfive.github.io/vimtronner/img/vimtronner-name.png
+[game_play_img]: http://carbonfive.github.io/vimtronner/img/vimtronner1.gif
