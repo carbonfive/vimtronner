@@ -1,0 +1,20 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Chris Svenningsen -- Dev -- @hmmwhatsthis
+    Bobby Matson -- Dev -- @bomatson
+    Rudy Jahchan -- Dev -- @rudy
+
+# THANKS
+
+    Patrick Moody
+    Carbon Five
+    Steven Lisberger
+    The 80s
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3
+    Bootstrap, Normalize.css, jQuery, Modernizr

@@ -1,0 +1,39 @@
+html, body {
+  background-color: #002b36;
+  color: #839496;
+}
+
+.lead {
+  margin-top: 1em;
+  color: #93a1a1;
+}
+
+h1 {
+  text-align: center;
+  color: #268bd2;
+}
+
+code {
+  color: #268bd2;
+}
+
+.gameplay {
+  border: 1px #268bd2 solid;
+}
+
+.logo {
+  display: block;
+  margin-top: 2em;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+}
+
+.logo:active, .logo:hover {
+  color: white;
+  text-decoration: inherit;
+}
+
+@media (min-width: 658px) {
+  .container { width: 640px; }
+}
