@@ -4,8 +4,9 @@
 
 A multiplayer, realtime, command-line game that teaches you the core
 vim keys. Be the last player alive by either controlling your bike
-safely around obstacles or insert your own walls so that others crash into
-them. Just remember, you can't do both at the same time!
+safely around obstacles or enter INSERT mode to build walls for your
+opponents to crash into. Just remember, you can't do both
+at the same time!
 
 Inspired by [Patrick Moody's](http://patmoody.com)
 [vimsnake](http://vimsnake.com) and, of course,
