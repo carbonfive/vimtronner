@@ -1,3 +1,5 @@
+_site
+
 lib-cov
 *.seed
 *.log

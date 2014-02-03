@@ -80,8 +80,6 @@ describe 'Game', ->
     context 'when the game is waiting', ->
       beforeEach ->
         @game.state = Game.STATES.WAITING
-        @emit = sinon.stub(@game, 'emit')
-        @start = sinon.stub(@game, 'start')
         @addedCycle = @game.addCycle()
 
       it 'returns a new cycle', ->
@@ -89,7 +87,7 @@ describe 'Game', ->
         expect(@addedCycle).to.be.instanceOf(Cycle)
 
       it 'adds the cycle to list of cycles', ->
-        expect(@game.cycles).to.include(@addedCycle)
+        expect(@game.cycles[0]).to.be.eq(@addedCycle)
 
   describe '#removeCycle', ->
     context 'given a cycle', ->
@@ -102,10 +100,11 @@ describe 'Game', ->
         @removedCycle = @game.removeCycle(@firstCycle)
 
       it 'removes the cycle from the list', ->
-        expect(@game.cycles).to.not.include(@firstCycle)
+        expect(@game.cycles.length).to.eq(1)
+        expect(@game.cycles[0]).to.not.eq(@firstCycle)
 
       it 'preserves the other cycle in the list', ->
-        expect(@game.cycles).to.include(@secondCycle)
+        expect(@game.cycles[0]).to.eq(@secondCycle)
 
       it 'checks for the winner', ->
         expect(@winnerCheck).to.have.been.called

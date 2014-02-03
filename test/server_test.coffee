@@ -44,7 +44,7 @@ describe 'Server', ->
     itBehavesLikeItStartsListeningOn = (portDescription, port)->
       it "starts listening on #{portDescription}", (done)->
         http.get "http://127.0.0.1:#{port}", (response)->
-          expect(response.statusCode).to.eq 200
+          expect(response.statusCode).to.eq 303
           done()
 
       it 'responds to web socket connections', (done)->
@@ -62,4 +62,4 @@ describe 'Server', ->
       beforeEach -> @server.listen()
       afterEach -> @server.close()
 
-      itBehavesLikeItStartsListeningOn('port 8000', 8000)
+      itBehavesLikeItStartsListeningOn('port 8766', 8766)

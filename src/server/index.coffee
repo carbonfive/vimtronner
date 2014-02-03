@@ -31,7 +31,7 @@ class Server
     socket.disconnect() for socket in @io.sockets.clients(game.name)
     delete @games[game.name]
 
-  listen: (@port=8000, options..., cb=(->))=>
+  listen: (@port=8766, options..., cb=(->))=>
     @checkDeadGameInterval = setInterval @checkForDeadGames, 180000
     collectedOptions = { log: false }
     for option in options
@@ -50,8 +50,10 @@ class Server
     new ClientSocket(socket, @)
 
   onRequest: (request, response)=>
-    response.writeHead 200
-    response.end 'Hello, world!'
+    response.writeHead 303, {
+      'Location': 'http://carbonfive.github.io/vimtronner'
+    }
+    response.end()
 
   close: (cb=(->))->
     clearInterval @checkDeadGameInterval
