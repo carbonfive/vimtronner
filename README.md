@@ -45,7 +45,7 @@ direction:
 * go right by pressing `l`
 
 To start creating insert walls, enter INSERT mode by pressing
-`i`. **BUT** remember; you can change your direction while in
+`i`. **BUT** remember; you cannot change your direction while in
 INSERT mode. To return to normal press `ESC` or `CTRL-[`. Press
 `q` to quit anytime.
 
