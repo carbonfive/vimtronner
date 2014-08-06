@@ -3,6 +3,7 @@ require '../../define_property'
 pixi = require 'pixi'
 
 playerColors = require './player_colors'
+CONSTANTS = require './constants'
 Game = require '../../models/game'
 Cycle = require '../../models/cycle'
 CycleView = require './cycle_view'
@@ -11,7 +12,6 @@ class GameView
   constructor: ->
     @cycleViews = []
     @countString = ''
-    @setStage()
 
   @property 'state', get: -> @_game?.state
 
@@ -25,6 +25,7 @@ class GameView
   @property 'game', {
     set: (game)->
       @_game = game
+      @setStage() unless @stage
       if @state == Game.STATES.COUNTDOWN
         if @_game.count != @lastCount and @state == Game.STATES.COUNTDOWN
           @lastCount = @_game.count
@@ -36,14 +37,16 @@ class GameView
     get: -> @_game
   }
 
-  setStage: ->
+  setStage: =>
     @stage = new pixi.Stage(0xaaaaaa)
-    @renderer = pixi.autoDetectRenderer(800,600)
+    width = @_game.width * CONSTANTS.DIMENSION_SCALE
+    height = @_game.height * CONSTANTS.DIMENSION_SCALE
+    @renderer = pixi.autoDetectRenderer(width, height)
     document.body.appendChild @renderer.view
     requestAnimationFrame(@animate)
     walls = new pixi.Graphics()
     walls.lineStyle(3, 0x000000,1)
-    walls.drawRect(0,0,800,600)
+    walls.drawRect(0,0, width, height)
     @stage.addChild(walls)
 
   animate: =>
@@ -74,8 +77,6 @@ class GameView
   renderArena: ->
 
   generateCycleViews: ->
-    #console.log @_game.cycles
-    #@cycleViews = (new CycleView(cycle, @_game) for cycle in @_game.cycles)
     @createOrUpdateCycleView(cycle) for cycle in @_game.cycles
 
   createOrUpdateCycleView: (cycle) ->

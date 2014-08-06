@@ -3,6 +3,7 @@ pixi = require 'pixi'
 
 directions = require '../../models/directions'
 playerColors = require './player_colors'
+CONSTANTS = require './constants'
 Game = require '../../models/game'
 Cycle = require '../../models/cycle'
 
@@ -30,20 +31,22 @@ class CycleView
     else
       CYCLE_CHAR[@cycle.direction]
 
+  nextX: ->
+    (@cycle.x + 1) * CONSTANTS.DIMENSION_SCALE
+
+  nextY: ->
+    (@cycle.y + 1) * CONSTANTS.DIMENSION_SCALE
+
   createCycleCharacter: ->
     @cycleCharacter = new pixi.Graphics()
     cycle_color = playerColors(@cycle.number)['web']
     @cycleCharacter.lineStyle(2, cycle_color)
-    nextX = (@cycle.x) + 1
-    nextY = (@cycle.y) + 1
-    @cycleCharacter.drawCircle(nextX, nextY, 5)
+    @cycleCharacter.drawCircle(0, 0, 5)
 
   render: (stage) ->
     @createCycleCharacter() if @cycleCharacter == undefined
-    nextX = (@cycle.x) + 1
-    nextY = (@cycle.y) + 1
-    @cycleCharacter.position.x = nextX
-    @cycleCharacter.position.y = nextY
+    @cycleCharacter.position.x = @nextX()
+    @cycleCharacter.position.y = @nextY()
     stage.addChild(@cycleCharacter) unless stage.children.indexOf(@cycleCharacter) > 0
     #@renderWallViews()
 
