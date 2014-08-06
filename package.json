@@ -33,13 +33,18 @@
     "grunt-mocha": "~0.4.9",
     "grunt-mocha-test": "~0.8.2",
     "grunt-contrib-coffee": "~0.8.2",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-browserify": "",
+    "browserify": ""
   },
   "dependencies": {
-    "socket.io": "",
-    "socket.io-client": "",
+    "socket.io": "~0.9",
+    "socket.io-client": "~0.9",
     "commander": "",
-    "moniker": ""
+    "moniker": "",
+    "express": "",
+    "jquery": "",
+    "pixi": ""
   },
   "bin": {
     "vimtronner": "./bin/vimtronner"

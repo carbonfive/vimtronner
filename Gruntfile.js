@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     mochaTest: {
@@ -26,6 +27,13 @@ module.exports = function(grunt) {
         ext: '.js'
       }
     },
+    browserify: {
+      dist: {
+        files: {
+          'public/js/start.js': ['lib/web_client/start.js']
+        }
+      }
+    },
     watch: {
       tests: {
         files: ['test/**/*_test.coffee'],
@@ -37,6 +45,6 @@ module.exports = function(grunt) {
       }
     }
   });
-  grunt.registerTask('build', ['coffee', 'mochaTest']);
+  grunt.registerTask('build', ['coffee', 'browserify', 'mochaTest']);
   grunt.registerTask('default', ['mochaTest']);
 };
