@@ -128,13 +128,13 @@ class GameView
     y += 1
     screen.print("YOU CAN ONLY BUILD WALLS WHEN INSERT MODE IS ON", centerX, y++, screen.TEXT_ALIGN.CENTER)
     screen.print("YOU CANNOT CHANGE DIRECTION WHEN INSERT MODE IS ON", centerX, y++, screen.TEXT_ALIGN.CENTER)
-    screen.setForegroundColor playerColors(@cycleNumber)
+    screen.setForegroundColor playerColors(@cycleNumber)['cli']
     screen.print("YOUR COLOR IS:", centerX, ++y, screen.TEXT_ALIGN.CENTER)
     y++
-    screen.setBackgroundColor playerColors(@cycleNumber)
+    screen.setBackgroundColor playerColors(@cycleNumber)['cli']
     screen.print("              ", centerX, y, screen.TEXT_ALIGN.CENTER)
     screen.resetColors()
-    screen.setForegroundColor playerColors(@cycleNumber)
+    screen.setForegroundColor playerColors(@cycleNumber)['cli']
     y += 2
     if @playerCycle.ready
       screen.print("READY PLAYER #{cycleNumberName(@cycleNumber)}", centerX, y++, screen.TEXT_ALIGN.CENTER)
@@ -172,7 +172,7 @@ class GameView
     screen.print 'GAME OVER', centerX, y, screen.TEXT_ALIGN.CENTER
 
     y +=2
-    screen.setForegroundColor playerColors(@cycleNumber)
+    screen.setForegroundColor playerColors(@cycleNumber)['cli']
     if @game.isPractice
       screen.print 'READY FOR A REAL GAME?', centerX, y, screen.TEXT_ALIGN.CENTER
     else
@@ -191,13 +191,13 @@ class GameView
   renderGameInfo: ->
     if @game.name? and @cycleNumber?
       name = if @game.isPractice then 'PRACTICE' else @game.name
-      screen.setBackgroundColor playerColors(@cycleNumber)
+      screen.setBackgroundColor playerColors(@cycleNumber)['cli']
       screen.setForegroundColor 0
       screen.print((' ' for i in [1..screen.columns]).join(''), 1, screen.rows - 1)
       screen.print("#{name}  Player: #{@cycleNumber}  State: #{@stateString}", 1, screen.rows - 1)
       screen.resetColors()
       if @playerCycle.state == 4
-        screen.setForegroundColor playerColors(@cycleNumber)
+        screen.setForegroundColor playerColors(@cycleNumber)['cli']
         screen.print('-- INSERT --', 1, screen.rows)
         screen.resetColors()
 
