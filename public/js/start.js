@@ -1248,7 +1248,6 @@
 
     GameView.prototype.animate = function() {
       requestAnimationFrame(this.animate);
-      console.log(this.stage.children);
       return this.renderer.render(this.stage);
     };
 
