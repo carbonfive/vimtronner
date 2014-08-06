@@ -6,6 +6,6 @@ $ ->
   client.join
     name: 'dysfunctional-apparatus',
     numberOfPlayers: 2,
-    height: 100,
-    width: 100
+    height: 50,
+    width: 80
 
