@@ -1,5 +1,6 @@
 http = require 'http'
 socketio = require 'socket.io'
+express = require 'express'
 Moniker = require 'moniker'
 
 Game = require '../models/game'
@@ -37,7 +38,8 @@ class Server
     for option in options
       for key, value of option
         collectedOptions[key] = value
-    @server = http.createServer(@onRequest)
+    @createWebServer()
+    @server = http.Server(@webApp)
     @io = socketio.listen(@server, collectedOptions)
     @io.sockets.on 'connection', @onConnection
     @server.listen @port, cb
@@ -49,14 +51,20 @@ class Server
   onConnection: (socket)=>
     new ClientSocket(socket, @)
 
-  onRequest: (request, response)=>
-    response.writeHead 303, {
-      'Location': 'http://carbonfive.github.io/vimtronner'
-    }
-    response.end()
-
   close: (cb=(->))->
     clearInterval @checkDeadGameInterval
     @server?.close cb
+
+  createWebServer: ->
+    @webApp = express()
+    @configureWebApp()
+    @createRoutes()
+
+  configureWebApp: ->
+    @webApp.use express.static('public')
+
+  createRoutes: ->
+    @webApp.get '/', (request, response) ->
+      response.sendfile('index.html')
 
 module.exports = Server
