@@ -6,7 +6,7 @@ GameView = require './views/game_view'
 GameListView = require './views/game_list_view'
 
 class Client
-  constructor: (@address="127.0.0.1", @port=8000)->
+  constructor: (@address="127.0.0.1", @port=8766)->
     @errorMessages = []
 
   @property 'url', get: -> "http://#{@address}:#{@port}"
