@@ -1292,6 +1292,7 @@
     };
 
     GameView.prototype.render = function() {
+      $('#game-status').html(this.stateString);
       if (this.state === Game.STATES.WAITING || (this.state === Game.STATES.RESTARTING && this.playerCycle.ready)) {
         this.renderWaitScreen();
       } else if (this.state === Game.STATES.COUNTDOWN) {

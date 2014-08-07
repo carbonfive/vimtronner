@@ -54,6 +54,7 @@ class GameView
     @renderer.render(@stage)
 
   render: ->
+    $('#game-status').html(@stateString)
     if @state == Game.STATES.WAITING or (@state == Game.STATES.RESTARTING and @playerCycle.ready)
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
