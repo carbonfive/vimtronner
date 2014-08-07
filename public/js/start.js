@@ -1044,10 +1044,9 @@
 
     CycleView.CYCLE_CHARS = CYCLE_CHAR;
 
-    function CycleView(cycle, game) {
-      this.cycle = cycle;
+    function CycleView(game) {
       this.game = game;
-      this.generateWallViews();
+      this.wallViews = [];
       Object.defineProperty(this, 'nameX', {
         get: this._nameX
       });
@@ -1056,31 +1055,40 @@
       });
     }
 
+    CycleView.property('cycle', {
+      set: function(cycle) {
+        this._cycle = cycle;
+        return this.generateWallViews();
+      },
+      get: function() {
+        return this._cycle;
+      }
+    });
+
     CycleView.prototype.character = function() {
       var explosionIndex;
-      if (this.cycle.state === Cycle.STATES.EXPLODING) {
-        explosionIndex = this.cycle.explosionFrame % 3;
+      if (this._cycle.state === Cycle.STATES.EXPLODING) {
+        explosionIndex = this._cycle.explosionFrame % 3;
         return CYCLE_EXPLOSION[explosionIndex];
-      } else if (this.cycle.state === Cycle.STATES.DEAD) {
+      } else if (this._cycle.state === Cycle.STATES.DEAD) {
         return CYCLE_EXPLODED;
       } else {
-        return CYCLE_CHAR[this.cycle.direction];
+        return CYCLE_CHAR[this._cycle.direction];
       }
     };
 
     CycleView.prototype.nextX = function() {
-      return (this.cycle.x + 1) * CONSTANTS.DIMENSION_SCALE;
+      return (this._cycle.x + 1) * CONSTANTS.DIMENSION_SCALE;
     };
 
     CycleView.prototype.nextY = function() {
-      return (this.cycle.y + 1) * CONSTANTS.DIMENSION_SCALE;
+      return (this._cycle.y + 1) * CONSTANTS.DIMENSION_SCALE;
     };
 
     CycleView.prototype.createCycleCharacter = function() {
-      var cycle_color;
       this.cycleCharacter = new pixi.Graphics();
-      cycle_color = playerColors(this.cycle.number)['web'];
-      this.cycleCharacter.lineStyle(2, cycle_color);
+      this.cycle_color = playerColors(this._cycle.number)['web'];
+      this.cycleCharacter.lineStyle(2, this.cycle_color);
       return this.cycleCharacter.drawCircle(0, 0, 5);
     };
 
@@ -1088,35 +1096,44 @@
       if (this.cycleCharacter === void 0) {
         this.createCycleCharacter();
       }
-      console.log("next dims for cycle " + this.cycle.number + ":", this.nextY(), this.nextX());
       this.cycleCharacter.position.x = this.nextX();
       this.cycleCharacter.position.y = this.nextY();
       if (!(stage.children.indexOf(this.cycleCharacter) > 0)) {
-        return stage.addChild(this.cycleCharacter);
+        stage.addChild(this.cycleCharacter);
       }
+      return this.renderWallViews(stage);
     };
 
     CycleView.prototype.generateWallViews = function() {
-      var wall;
-      return this.wallViews = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.cycle.walls;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          wall = _ref[_i];
-          _results.push(new WallView(wall));
-        }
-        return _results;
-      }).call(this);
+      var wall, _i, _len, _ref, _results;
+      _ref = this._cycle.walls;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        wall = _ref[_i];
+        _results.push(this.createNewWallViews(wall));
+      }
+      return _results;
     };
 
-    CycleView.prototype.renderWallViews = function() {
+    CycleView.prototype.createNewWallViews = function(wall) {
+      var wallView;
+      wallView = this.wallViews.filter(function(view) {
+        return view.wall === wall;
+      })[0];
+      if (wallView === void 0) {
+        wallView = new WallView(wall, this.cycle_color);
+        this.wallViews.push(wallView);
+        return wallView.wall = wall;
+      }
+    };
+
+    CycleView.prototype.renderWallViews = function(stage) {
       var wallView, _i, _len, _ref, _results;
       _ref = this.wallViews;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         wallView = _ref[_i];
-        _results.push(wallView.render());
+        _results.push(wallView.render(stage));
       }
       return _results;
     };
@@ -1126,13 +1143,13 @@
     CycleView.property('nameX', function() {});
 
     CycleView.property('nameY', function() {
-      return CycleView.cycle.y + 1;
+      return CycleView._cycle.y + 1;
     });
 
     CycleView.prototype.renderWinnerMessage = function() {
       var messageX, messageY;
-      messageX = this.cycle.x - 1;
-      return messageY = this.cycle.y;
+      messageX = this._cycle.x - 1;
+      return messageY = this._cycle.y;
     };
 
     return CycleView;
@@ -1319,7 +1336,7 @@
         return view.cycle.number === cycle.number;
       })[0];
       if (cycleView === void 0) {
-        cycleView = new CycleView(cycle, this._game);
+        cycleView = new CycleView(this._game);
         this.cycleViews.push(cycleView);
       }
       return cycleView.cycle = cycle;
@@ -1388,24 +1405,43 @@
 
 },{}],15:[function(require,module,exports){
 (function() {
-  var WALL_CHARACTERS, Wall, WallView;
+  var CONSTANTS, Wall, WallView, pixi;
+
+  pixi = require('pixi');
+
+  CONSTANTS = require('./constants');
 
   Wall = require('../../models/wall');
 
-  WALL_CHARACTERS = {};
-
   WallView = (function() {
-    function WallView(wall) {
+    function WallView(wall, color) {
       this.wall = wall;
+      this.color = color;
     }
 
-    WallView.prototype.character = function() {
-      return WALL_CHARACTERS[this.wall.type];
+    WallView.prototype.wallX = function() {
+      return (this.wall.x + 1) * CONSTANTS.DIMENSION_SCALE;
     };
 
-    WallView.prototype.render = function() {
-      var nextX;
-      return nextX = this.wall.x + 1;
+    WallView.prototype.wallY = function() {
+      return (this.wall.y + 1) * CONSTANTS.DIMENSION_SCALE;
+    };
+
+    WallView.prototype.render = function(stage) {
+      if (this.wallCharacter === void 0) {
+        return this.createWallCharacter(stage);
+      }
+    };
+
+    WallView.prototype.createWallCharacter = function(stage) {
+      this.wallCharacter = new pixi.Graphics();
+      this.wallCharacter.lineStyle(2, this.color);
+      this.wallCharacter.drawRect(0, 0, 2, 2);
+      this.wallCharacter.position.x = this.wallX();
+      this.wallCharacter.position.y = this.wallY();
+      if (!(stage.children.indexOf(this.wallCharacter) > 0)) {
+        return stage.addChild(this.wallCharacter);
+      }
     };
 
     return WallView;
@@ -1418,7 +1454,7 @@
 
 //# sourceMappingURL=../../../maps/wall_view.js.map
 
-},{"../../models/wall":7}],16:[function(require,module,exports){
+},{"../../models/wall":7,"./constants":10,"pixi":62}],16:[function(require,module,exports){
 
 },{}],17:[function(require,module,exports){
 /*!

@@ -14,33 +14,39 @@ CYCLE_CHAR = {}
 class CycleView
   @CYCLE_CHARS: CYCLE_CHAR
 
-  constructor: (cycle, game)->
-    @cycle = cycle
+  constructor: (game)->
     @game = game
-    @generateWallViews()
+    @wallViews = []
 
     Object.defineProperty @, 'nameX', get: @_nameX
     Object.defineProperty @, 'nameY', get: @_nameY
 
+  @property 'cycle', {
+    set: (cycle)->
+      @_cycle = cycle
+      @generateWallViews()
+    get: -> @_cycle
+  }
+
   character: ->
-    if @cycle.state == Cycle.STATES.EXPLODING
-      explosionIndex = @cycle.explosionFrame % 3
+    if @_cycle.state == Cycle.STATES.EXPLODING
+      explosionIndex = @_cycle.explosionFrame % 3
       CYCLE_EXPLOSION[explosionIndex]
-    else if @cycle.state == Cycle.STATES.DEAD
+    else if @_cycle.state == Cycle.STATES.DEAD
       CYCLE_EXPLODED
     else
-      CYCLE_CHAR[@cycle.direction]
+      CYCLE_CHAR[@_cycle.direction]
 
   nextX: ->
-    (@cycle.x + 1) * CONSTANTS.DIMENSION_SCALE
+    (@_cycle.x + 1) * CONSTANTS.DIMENSION_SCALE
 
   nextY: ->
-    (@cycle.y + 1) * CONSTANTS.DIMENSION_SCALE
+    (@_cycle.y + 1) * CONSTANTS.DIMENSION_SCALE
 
   createCycleCharacter: ->
     @cycleCharacter = new pixi.Graphics()
-    cycle_color = playerColors(@cycle.number)['web']
-    @cycleCharacter.lineStyle(2, cycle_color)
+    @cycle_color = playerColors(@_cycle.number)['web']
+    @cycleCharacter.lineStyle(2, @cycle_color)
     @cycleCharacter.drawCircle(0, 0, 5)
 
   render: (stage) ->
@@ -48,13 +54,24 @@ class CycleView
     @cycleCharacter.position.x = @nextX()
     @cycleCharacter.position.y = @nextY()
     stage.addChild(@cycleCharacter) unless stage.children.indexOf(@cycleCharacter) > 0
-    #@renderWallViews()
+    @renderWallViews(stage)
 
   generateWallViews: ->
-    @wallViews = (new WallView(wall) for wall in @cycle.walls)
+    @createNewWallViews(wall) for wall in @_cycle.walls
 
-  renderWallViews: ->
-    wallView.render() for wallView in @wallViews
+  createNewWallViews: (wall) ->
+    wallView = @wallViews.filter((view) ->
+      view.wall == wall
+    )[0]
+
+    if wallView == undefined
+      wallView = new WallView(wall, @cycle_color)
+      @wallViews.push wallView
+      wallView.wall = wall
+
+
+  renderWallViews: (stage) ->
+    wallView.render(stage) for wallView in @wallViews
 
   renderName: ->
     #screen.moveTo(@nameX, @nameY)
@@ -64,11 +81,11 @@ class CycleView
     #screenX = @cycle.x
     #if @cycle.x > 25 then screenX - 10 else screenX + 5
 
-  @property 'nameY', => @cycle.y + 1
+  @property 'nameY', => @_cycle.y + 1
 
   renderWinnerMessage: ->
-    messageX = @cycle.x - 1
-    messageY = @cycle.y
+    messageX = @_cycle.x - 1
+    messageY = @_cycle.y
     #screen.moveTo(messageX, messageY)
     #process.stdout.write "Winner!!!"
 

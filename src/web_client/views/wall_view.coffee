@@ -1,16 +1,25 @@
+pixi = require 'pixi'
+CONSTANTS = require './constants'
 Wall = require '../../models/wall'
 
-WALL_CHARACTERS = {}
-
 class WallView
-  constructor: (wall)->
-    @wall = wall
+  constructor: (@wall, @color)->
 
-  character: -> WALL_CHARACTERS[@wall.type]
+  wallX: ->
+    (@wall.x + 1) * CONSTANTS.DIMENSION_SCALE
 
-  render: ->
-    nextX = (@wall.x) + 1
-    #screen.moveTo(nextX, @wall.y + 1)
-    #process.stdout.write @character()
+  wallY: ->
+    (@wall.y + 1) * CONSTANTS.DIMENSION_SCALE
+
+  render: (stage) ->
+    @createWallCharacter(stage) if @wallCharacter == undefined
+
+  createWallCharacter: (stage) ->
+    @wallCharacter = new pixi.Graphics()
+    @wallCharacter.lineStyle(2, @color)
+    @wallCharacter.drawRect(0, 0, 2, 2)
+    @wallCharacter.position.x = @wallX()
+    @wallCharacter.position.y = @wallY()
+    stage.addChild(@wallCharacter) unless stage.children.indexOf(@wallCharacter) > 0
 
 module.exports = WallView

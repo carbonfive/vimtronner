@@ -85,7 +85,7 @@ class GameView
     )[0]
 
     if cycleView == undefined
-      cycleView = new CycleView(cycle, @_game)
+      cycleView = new CycleView(@_game)
       @cycleViews.push cycleView
 
     cycleView.cycle = cycle
