@@ -910,19 +910,29 @@
         _this = this;
       errorChecks = {
         "Width cannot be smaller than 80": function() {
-          return _this.gameAttributes.width < 80;
+          if (_this.gameAttributes.width) {
+            return _this.gameAttributes.width < 80;
+          }
         },
         "Width cannot be greater than screen size": function() {
-          return _this.gameAttributes.width > screen.columns;
+          if (_this.gameAttributes.width) {
+            return _this.gameAttributes.width > screen.columns;
+          }
         },
         "Height cannot be smaller than 22": function() {
-          return _this.gameAttributes.width < 22;
+          if (_this.gameAttributes.width) {
+            return _this.gameAttributes.width < 22;
+          }
         },
         "Height cannot be greater than screen size": function() {
-          return _this.gameAttributes.height > screen.rows - 2;
+          if (_this.gameAttributes.height) {
+            return _this.gameAttributes.height > screen.rows - 2;
+          }
         },
         "Number of players must be between 1 to 6": function() {
-          return _this.gameAttributes.numberOfPlayers < 1 || _this.gameAttributes.numberOfPlayers > 6;
+          if (_this.gameAttributes.numberOfPlayers) {
+            return _this.gameAttributes.numberOfPlayers < 1 || _this.gameAttributes.numberOfPlayers > 6;
+          }
         }
       };
       errors = (function() {
@@ -947,14 +957,20 @@
 
     WebClient.prototype.connect = function(callback) {
       var _this = this;
-      this.socket = socketio.connect(this.url);
-      this.socket.on('connect', callback);
-      this.socket.on('connect_error', this.connectError);
-      this.socket.on('connect_timeout', this.connectError);
-      this.socket.on('error', this.connectError);
-      return this.socket.on('connecting', function() {
-        return console.log("Connecting to " + _this.url + " ...\n");
-      });
+      if (this.socket) {
+        return callback();
+      } else {
+        if (!this.socket) {
+          this.socket = socketio.connect(this.url);
+        }
+        this.socket.on('connect', callback);
+        this.socket.on('connect_error', this.connectError);
+        this.socket.on('connect_timeout', this.connectError);
+        this.socket.on('error', this.connectError);
+        return this.socket.on('connecting', function() {
+          return console.log("Connecting to " + _this.url + " ...\n");
+        });
+      }
     };
 
     WebClient.prototype.connectError = function(error) {
@@ -969,9 +985,17 @@
     };
 
     WebClient.prototype.onGames = function(games) {
+      var _this = this;
       this.gameListView.addGames(games);
       this.gameListView.render();
-      return this.socket.disconnect();
+      return $('.waiting-game').find('a').click(function(event) {
+        var gameName;
+        event.stopPropagation();
+        gameName = $(event.target).attr('data-name');
+        return _this.join({
+          name: gameName
+        });
+      });
     };
 
     return WebClient;
@@ -995,12 +1019,7 @@
   $(function() {
     var client;
     client = new WebClient();
-    return client.join({
-      name: 'dysfunctional-apparatus',
-      numberOfPlayers: 2,
-      height: 50,
-      width: 80
-    });
+    return client.listGames();
   });
 
 }).call(this);
@@ -1183,7 +1202,7 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         game = _ref[_i];
-        _results.push($('#game-list').append("<li>" + game.name + "</li>"));
+        _results.push($('#game-list').append("<li class='waiting-game'>" + game.name + " <a href='#' data-name='" + game.name + "'>join</a></li>"));
       }
       return _results;
     };

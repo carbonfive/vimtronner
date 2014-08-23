@@ -46,16 +46,16 @@ class WebClient
   checkValidity: ->
     errorChecks = {
       "Width cannot be smaller than 80": =>
-        @gameAttributes.width < 80
+        @gameAttributes.width < 80 if @gameAttributes.width
       "Width cannot be greater than screen size": =>
-        @gameAttributes.width > screen.columns
+        @gameAttributes.width > screen.columns if @gameAttributes.width
       "Height cannot be smaller than 22": =>
-        @gameAttributes.width < 22
+        @gameAttributes.width < 22 if @gameAttributes.width
       "Height cannot be greater than screen size": =>
-        @gameAttributes.height > screen.rows - 2
+        @gameAttributes.height > screen.rows - 2 if @gameAttributes.height
       "Number of players must be between 1 to 6": =>
         @gameAttributes.numberOfPlayers < 1 or
-          @gameAttributes.numberOfPlayers > 6
+          @gameAttributes.numberOfPlayers > 6 if @gameAttributes.numberOfPlayers
     }
     errors = (message for message, check of errorChecks when check())
     (throw new Error(
@@ -70,13 +70,16 @@ class WebClient
     @connect(@andListGames)
 
   connect: (callback)->
-    @socket = socketio.connect(@url)
-    @socket.on 'connect', callback
-    @socket.on 'connect_error', @connectError
-    @socket.on 'connect_timeout', @connectError
-    @socket.on 'error', @connectError
-    @socket.on 'connecting', =>
-      console.log "Connecting to #{@url} ...\n"
+    if @socket
+      callback()
+    else
+      @socket = socketio.connect(@url) unless @socket
+      @socket.on 'connect', callback
+      @socket.on 'connect_error', @connectError
+      @socket.on 'connect_timeout', @connectError
+      @socket.on 'error', @connectError
+      @socket.on 'connecting', =>
+        console.log "Connecting to #{@url} ...\n"
 
   connectError: (error) =>
     console.log error
@@ -90,6 +93,10 @@ class WebClient
   onGames: (games)=>
     @gameListView.addGames(games)
     @gameListView.render()
-    @socket.disconnect()
+    $('.waiting-game').find('a').click (event) =>
+      event.stopPropagation()
+      gameName = $(event.target).attr('data-name')
+      @join(name: gameName)
+
 
 module.exports = WebClient
