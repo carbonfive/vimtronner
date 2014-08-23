@@ -17,12 +17,31 @@ class WebClient
     @listenToEvents()
 
   listenToEvents: ->
-    $(document).keypress (event) =>
-      switch event.charCode
+    $(document).keyup (event) =>
+      translatedCode = @translate(event.keyCode)
+      switch translatedCode
         when 113
           @quit()
         else
-          @socket.emit 'movement', event.charCode
+          @socket.emit 'movement', translatedCode
+
+  translate: (keyCode) ->
+    switch keyCode
+      when 76 # l
+        108
+      when 73 # i
+        105
+      when 74 # j
+        106
+      when 75 # k
+        107
+      when 72 # h
+        104
+      when 81 # q
+        113
+      else
+        keyCode
+
 
   quit: ->
     @socket.disconnect()

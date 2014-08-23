@@ -868,14 +868,35 @@
 
     WebClient.prototype.listenToEvents = function() {
       var _this = this;
-      return $(document).keypress(function(event) {
-        switch (event.charCode) {
+      return $(document).keyup(function(event) {
+        var translatedCode;
+        translatedCode = _this.translate(event.keyCode);
+        switch (translatedCode) {
           case 113:
             return _this.quit();
           default:
-            return _this.socket.emit('movement', event.charCode);
+            return _this.socket.emit('movement', translatedCode);
         }
       });
+    };
+
+    WebClient.prototype.translate = function(keyCode) {
+      switch (keyCode) {
+        case 76:
+          return 108;
+        case 73:
+          return 105;
+        case 74:
+          return 106;
+        case 75:
+          return 107;
+        case 72:
+          return 104;
+        case 81:
+          return 113;
+        default:
+          return keyCode;
+      }
     };
 
     WebClient.prototype.quit = function() {
