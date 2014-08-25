@@ -56,6 +56,7 @@ class WebClient
 
   showErrorMessage: (message) =>
     @errorMessages.push message
+    console.log @errorMessages
 
   onGameUpdate: (game)=>
     @gameView.game = game
@@ -67,11 +68,11 @@ class WebClient
       "Width cannot be smaller than 80": =>
         @gameAttributes.width < 80 if @gameAttributes.width
       "Width cannot be greater than screen size": =>
-        @gameAttributes.width > screen.columns if @gameAttributes.width
+        @gameAttributes.width > $(window).width() if @gameAttributes.width
       "Height cannot be smaller than 22": =>
         @gameAttributes.width < 22 if @gameAttributes.width
       "Height cannot be greater than screen size": =>
-        @gameAttributes.height > screen.rows - 2 if @gameAttributes.height
+        @gameAttributes.height > $(window).height()  if @gameAttributes.height
       "Number of players must be between 1 to 6": =>
         @gameAttributes.numberOfPlayers < 1 or
           @gameAttributes.numberOfPlayers > 6 if @gameAttributes.numberOfPlayers
@@ -117,5 +118,13 @@ class WebClient
       gameName = $(event.target).attr('data-name')
       @join(name: gameName)
 
+    $('#new-game').click (event) =>
+      event.stopPropagation()
+      gameName = $('#new-game-name').val()
+      @join
+        name: gameName if gameName
+        height: ($(window).height() / 1.5) / 10 # ~3/4 screen after multiplying
+        width: ($(window).width() / 1.5) / 10 # ~3/4 screen after multiplying
+        numberOfPlayers: 2
 
 module.exports = WebClient

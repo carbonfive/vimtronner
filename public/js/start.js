@@ -917,7 +917,8 @@
     };
 
     WebClient.prototype.showErrorMessage = function(message) {
-      return this.errorMessages.push(message);
+      this.errorMessages.push(message);
+      return console.log(this.errorMessages);
     };
 
     WebClient.prototype.onGameUpdate = function(game) {
@@ -937,7 +938,7 @@
         },
         "Width cannot be greater than screen size": function() {
           if (_this.gameAttributes.width) {
-            return _this.gameAttributes.width > screen.columns;
+            return _this.gameAttributes.width > $(window).width();
           }
         },
         "Height cannot be smaller than 22": function() {
@@ -947,7 +948,7 @@
         },
         "Height cannot be greater than screen size": function() {
           if (_this.gameAttributes.height) {
-            return _this.gameAttributes.height > screen.rows - 2;
+            return _this.gameAttributes.height > $(window).height();
           }
         },
         "Number of players must be between 1 to 6": function() {
@@ -1009,12 +1010,23 @@
       var _this = this;
       this.gameListView.addGames(games);
       this.gameListView.render();
-      return $('.waiting-game').find('a').click(function(event) {
+      $('.waiting-game').find('a').click(function(event) {
         var gameName;
         event.stopPropagation();
         gameName = $(event.target).attr('data-name');
         return _this.join({
           name: gameName
+        });
+      });
+      return $('#new-game').click(function(event) {
+        var gameName;
+        event.stopPropagation();
+        gameName = $('#new-game-name').val();
+        return _this.join({
+          name: gameName ? gameName : void 0,
+          height: ($(window).height() / 1.5) / 10,
+          width: ($(window).width() / 1.5) / 10,
+          numberOfPlayers: 2
         });
       });
     };
