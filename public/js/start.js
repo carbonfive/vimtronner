@@ -1344,7 +1344,7 @@
     };
 
     GameView.prototype.render = function() {
-      $('#game-status').html(this.stateString);
+      $('#game-container').show();
       if (this.state === Game.STATES.WAITING || (this.state === Game.STATES.RESTARTING && this.playerCycle.ready)) {
         this.renderWaitScreen();
       } else if (this.state === Game.STATES.COUNTDOWN) {
@@ -1405,7 +1405,10 @@
       return true;
     };
 
-    GameView.prototype.renderGameInfo = function() {};
+    GameView.prototype.renderGameInfo = function() {
+      $('#game-name').html(this._game.name);
+      return $('#game-status').html(this.stateString);
+    };
 
     return GameView;
 

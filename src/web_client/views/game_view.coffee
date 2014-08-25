@@ -54,7 +54,7 @@ class GameView
     @renderer.render(@stage)
 
   render: ->
-    $('#game-status').html(@stateString)
+    $('#game-container').show()
     if @state == Game.STATES.WAITING or (@state == Game.STATES.RESTARTING and @playerCycle.ready)
       @renderWaitScreen()
     else if @state == Game.STATES.COUNTDOWN
@@ -96,6 +96,8 @@ class GameView
     true
 
   renderGameInfo: ->
+    $('#game-name').html(@_game.name)
+    $('#game-status').html(@stateString)
 
 module.exports = GameView
 
