@@ -1,6 +1,6 @@
 ![vimtronner][game_play_img]
 
-#vimtronner
+# vimtronner
 
 A multiplayer, realtime, command-line game that teaches you the core
 vim keys. Be the last player alive by either controlling your bike
